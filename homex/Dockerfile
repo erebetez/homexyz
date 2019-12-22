@@ -15,8 +15,12 @@ RUN npm install
 # Bundle app source
 COPY . .
 
+RUN npm run build
+
+RUN npm install -g serve
+
 USER node
 
-EXPOSE 3000
+EXPOSE 5000
 
-CMD [ "node", "build/main.js" ]
+CMD [ "serve", "-s", "buld" ]
