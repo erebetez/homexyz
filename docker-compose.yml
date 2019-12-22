@@ -1,0 +1,35 @@
+version: "3"
+services:
+  homex:
+    build: ./homex
+    depends_on:
+      - homey
+    environment:
+      WEBSERVERHOST: homey
+      WEBSERVERPORT: 3666
+      WEBSOCKETPORT: 3667
+    ports:
+      - "5000:5000"
+
+  homey:
+    build: ./homey
+    depends_on:
+      - homez
+    environment:
+      PGUSER: homez
+      PGHOST: homez
+      PGPASSWORD: homez123
+      PGDATABASE: homez
+      NODE_ENV: production
+    ports:
+      - "3666:3666"
+      - "3667:3667"
+
+  homez:
+    build: ./homez
+    ports:
+      - "3665:5432"
+    environment:
+      POSTGRES_PASSWORD: post123
+    volumes:
+      - $HOME/docker/volumes/postgres:/var/lib/postgresql/data
