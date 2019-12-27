@@ -4,7 +4,6 @@ const { Pool, } = require('pg')
 let db = function () {
     let pool;
 
-
     return () => {
         if (pool) {
             return pool;
@@ -25,7 +24,7 @@ function dbEnd() {
     db().end();
 }
 
-async function setupNofication(notify) {
+async function setupNofication(notify, cb) {
     let con;
 
     try {
@@ -41,8 +40,9 @@ async function setupNofication(notify) {
 
         con.query('LISTEN devices');
         con.query('LISTEN events');
+        cb(undefined);
     } catch (e) {
-        console.error("Can't connect to pg db for notifications. " + e.message);
+        cb(e)
     }
 }
 

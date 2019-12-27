@@ -255,8 +255,14 @@ function notificationHandler(channel, row) {
 
 http.listen(port, "0.0.0.0", () => {
     console.log(`Homey app listening on port ${port}!`);
-    setupNofication(notificationHandler);
-    startWss();
+
+    setupNofication(notificationHandler, (err) => {
+        if (err) {
+            console.error("Can't connect to pg db for notifications. " + err.message);
+        } else {
+            startWss();
+        }
+    });
 })
 
 process.on('SIGINT', (code) => {
