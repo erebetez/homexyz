@@ -1,6 +1,6 @@
 import React from "react";
 import { ServiceData, Events } from "./provider.js";
-import { ToggleButton } from "./widgets.js";
+import { ToggleButton, HistoryDisplay } from "./widgets.js";
 import { Devices } from "./devices.js";
 
 function App() {
@@ -40,44 +40,28 @@ function App() {
 
                 <Events select="temperature1" last="10">
                   {(eventList, set) => (
-                    <React.Fragment>
-                      <ul>
-                        {eventList.map(item => (
-                          <li key={item.inserted}>
-                            {item.inserted} : {item.value}
-                            {states.temperature1.attribute.unit}
-                          </li>
-                        ))}
-                      </ul>
-                    </React.Fragment>
+                    <HistoryDisplay
+                      eventList={eventList}
+                      attribute={states.temperature1.attribute}
+                    ></HistoryDisplay>
                   )}
                 </Events>
 
                 <Events select="temperature2" last="10">
                   {(eventList, set) => (
-                    <React.Fragment>
-                      <ul>
-                        {eventList.map(item => (
-                          <li key={item.inserted}>
-                            {item.inserted} ": " {item.value}
-                          </li>
-                        ))}
-                      </ul>
-                    </React.Fragment>
+                    <HistoryDisplay
+                      eventList={eventList}
+                      attribute={states.temperature2.attribute}
+                    ></HistoryDisplay>
                   )}
                 </Events>
 
                 <Events select="humidity1" last="10">
                   {(eventList, set) => (
-                    <React.Fragment>
-                      <ul>
-                        {eventList.map(item => (
-                          <li key={item.inserted}>
-                            {item.inserted} ": " {item.value}
-                          </li>
-                        ))}
-                      </ul>
-                    </React.Fragment>
+                    <HistoryDisplay
+                      eventList={eventList}
+                      attribute={states.humidity1.attribute}
+                    ></HistoryDisplay>
                   )}
                 </Events>
 

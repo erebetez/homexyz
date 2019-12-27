@@ -47,10 +47,9 @@ class ServiceData extends React.Component {
   }
 
   componentDidMount() {
+    // TODO use parallel of async module
     this.fetchDevices();
     this.fetchStates();
-
-    this.setState({ loading: false });
 
     socket.addEventListener(
       "message",
@@ -88,7 +87,8 @@ class ServiceData extends React.Component {
       states: retr.reduce((acc, stat) => {
         acc[stat.key] = stat;
         return acc;
-      }, {})
+      }, {}),
+      loading: false
     });
   }
   render() {
