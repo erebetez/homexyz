@@ -1,4 +1,5 @@
 import React from "react";
+import { LineChart, Line, CartesianGrid, XAxis, YAxis } from "recharts";
 
 class DiscoverButton extends React.Component {
   constructor(props) {
@@ -31,15 +32,32 @@ class DiscoverButton extends React.Component {
 }
 
 function HistoryDisplay(props) {
+  let data = props.eventList.map(item => {
+    item["parsed"] = Date.parse(item["inserted"]);
+    return item;
+  });
   return (
-    <ul>
-      {props.eventList.map(item => (
-        <li key={item.inserted}>
-          {item.inserted} : {item.value}
-          {props.attribute.unit}
-        </li>
-      ))}
-    </ul>
+    <div>
+      <LineChart
+        width={730}
+        height={250}
+        data={data}
+        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+      >
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="parsed" scale="time" reversed="true" />
+        <YAxis dataKey="value" unit={props.attribute.unit} />
+        <Line type="monotone" dataKey="value" stroke="#8884d8" />
+      </LineChart>
+      <ul>
+        {props.eventList.map(item => (
+          <li key={item.inserted}>
+            {item.inserted} : {item.value}
+            {props.attribute.unit}
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
