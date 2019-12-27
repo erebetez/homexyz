@@ -3,6 +3,8 @@
 #include <ArduinoJson.h>
 #include <Adafruit_Sensor.h>
 #include <DHT.h>
+#include <DallasTemperature.h>
+#include <OneWire.h>
 
 const char* ssid     = "ssid";
 const char* password = "123456";
@@ -24,19 +26,20 @@ const int output4 = 4;
 // DHT11
 const int input5 = 5;
 
-// Light
-const int input15 = 15;
-int lightOn = 0;
 
 // KY035
 const int input0 = A0;
 int a0inputVal  = 0;
 
+// DS18B20
+#define ONE_WIRE_BUS 15
 
 // sensor setup
-#define DHTTYPE    DHT11     // DHT 11
-//#define DHTTYPE    DHT22     // DHT 22 (AM2302)
-//#define DHTTYPE    DHT21     // DHT 21 (AM2301)
+
+OneWire oneWire(ONE_WIRE_BUS); 
+DallasTemperature sensors(&oneWire);
+
+#define DHTTYPE    DHT11
 
 DHT dht(input5, DHTTYPE);
 
@@ -48,7 +51,8 @@ int output2State = 0;
 int output4State = 0;
 
 // Data
-float t = 0.0;
+float t1 = 0.0;
+float t2 = 0.0;
 float h = 0.0;
 
 using namespace websockets;
@@ -67,6 +71,7 @@ void setup() {
   digitalWrite(output4, LOW);
 
   dht.begin();
+  sensors.begin();
 
 
   // Set states
@@ -74,6 +79,7 @@ void setup() {
   states += "\"led1\": {\"location\": \"livingroom\",\"type\": \"switch\",\"range\": [0,1]},";
   states += "\"led2\": {\"location\": \"kitchen\",\"type\": \"dimmer\", \"range\": [0,9]},";
   states += "\"temperature1\": {\"location\": \"livingroom\",\"type\": \"sensor\", \"unit\": \"°C\"},";
+  states += "\"temperature2\": {\"location\": \"livingroom\",\"type\": \"sensor\", \"unit\": \"°C\"},";
   states += "\"humidity1\": {\"location\": \"livingroom\",\"type\": \"sensor\", \"unit\": \"%\"}";
   states += "}";
 
@@ -178,20 +184,13 @@ void onEventsCallback(WebsocketsEvent event, String data) {
 void loop() {
   webScoketsConnect();
 
-  // Do reading of sensors here
   long currentMillis = millis();
   if(currentMillis - lastMillis > interval){
     lastMillis = currentMillis;
-    readDataTemperature();
+    readDataTemperatureDHT();
+    readDataTemperatureOneWire();
     readDataHumidity();
   }
-
-  // lightOn = digitalRead(input15);
-  // Serial.println(lightOn);
-
-  // a0inputVal = analogRead(input0); // Analog Values 0 to 1023
-  // Serial.println (a0inputVal);
-  // delay(1000);
 }
 
 
@@ -209,7 +208,7 @@ void webScoketsConnect(){
   }
 }
 
-void readDataTemperature(){
+void readDataTemperatureDHT(){
   // Read temperature as Celsius (the default)
   float newT = dht.readTemperature();
 
@@ -218,10 +217,30 @@ void readDataTemperature(){
     return;
   }
 
-  Serial.println(t);
-  if (t != newT){
-    t = newT;
-    client.send("{\"key\": \"temperature1\", \"value\":" + String(t) + "}");
+
+  if (t1 != newT){
+    t1 = newT;
+    Serial.println(t1);
+    client.send("{\"key\": \"temperature1\", \"value\":" + String(t1) + "}");
+  }
+  return;
+}
+
+void readDataTemperatureOneWire(){
+  sensors.requestTemperatures();
+
+  float newT = sensors.getTempCByIndex(0);
+
+  if (newT == -127) {
+    Serial.println("Failed to read temperature from DS18B20 sensor!");
+    return;
+  }
+
+
+  if (t2 != newT){
+    t2 = newT;
+    Serial.println(t2);
+    client.send("{\"key\": \"temperature2\", \"value\":" + String(t2) + "}");
   }
   return;
 }
@@ -234,11 +253,10 @@ void readDataHumidity(){
     Serial.println("Failed to read humidity from DHT sensor!");
     return;
   }
-  
-  Serial.println(h);
 
   if(h != newH) {
     h = newH;
+    Serial.println(h);
     client.send("{\"key\": \"humidity1\", \"value\":" + String(h) + "}");
   }
 
