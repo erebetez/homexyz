@@ -28,5 +28,5 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:3666"
+  "proxy": "http://moria:3666"
 }

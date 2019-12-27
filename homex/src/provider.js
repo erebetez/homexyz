@@ -1,6 +1,6 @@
 import React from 'react';
 
-const socket = new WebSocket('ws://localhost:3667');
+const socket = new WebSocket('ws://moria:3667');
 
 const device = {
     id: "w1",
