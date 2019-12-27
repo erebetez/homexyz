@@ -6,7 +6,7 @@
 
 const char* ssid     = "ssid";
 const char* password = "123456";
-const char* websockets_server = "ws://192.168.0.5:3667";
+const char* websockets_server = "ws://moria:3667";
 
 
 // Device properties
@@ -217,11 +217,12 @@ void readDataTemperature(){
     Serial.println("Failed to read temperature from DHT sensor!");
     return;
   }
-  
-  t = newT;
-  Serial.println(t);
-  client.send("{\"key\": \"temperature1\", \"value\":" + String(t) + "}");
 
+  Serial.println(t);
+  if (t != newT){
+    t = newT;
+    client.send("{\"key\": \"temperature1\", \"value\":" + String(t) + "}");
+  }
   return;
 }
 
@@ -234,9 +235,12 @@ void readDataHumidity(){
     return;
   }
   
-  h = newH;
   Serial.println(h);
-  client.send("{\"key\": \"humidity1\", \"value\":" + String(h) + "}");
-  
+
+  if(h != newH) {
+    h = newH;
+    client.send("{\"key\": \"humidity1\", \"value\":" + String(h) + "}");
+  }
+
   return;
 }
