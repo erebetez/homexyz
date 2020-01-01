@@ -32,7 +32,7 @@ const int input0 = A0;
 int a0inputVal  = 0;
 
 // DS18B20
-#define ONE_WIRE_BUS 15
+#define ONE_WIRE_BUS 13
 
 // sensor setup
 
