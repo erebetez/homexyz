@@ -1,6 +1,18 @@
 import React from "react";
 import { LineChart, Line, CartesianGrid, XAxis, YAxis } from "recharts";
 
+function LastValue(props) {
+  if (props.eventList) {
+    return (
+      <div>
+        {props.eventList[0]} {props.attribute.unit}
+      </div>
+    );
+  } else {
+    return <div>No data</div>;
+  }
+}
+
 function HistoryDisplay(props) {
   let data = props.eventList.map(item => {
     item["parsed"] = Date.parse(item["inserted"]);
@@ -15,20 +27,22 @@ function HistoryDisplay(props) {
         margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
       >
         <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="parsed" scale="time" reversed="true" />
+        <XAxis
+          dataKey="parsed"
+          scale="time"
+          reversed="true"
+          tickFormatter={dateToString}
+        />
         <YAxis dataKey="value" unit={props.attribute.unit} />
         <Line type="monotone" dataKey="value" stroke="#8884d8" />
       </LineChart>
-      <ul>
-        {props.eventList.map(item => (
-          <li key={item.inserted}>
-            {item.inserted} : {item.value}
-            {props.attribute.unit}
-          </li>
-        ))}
-      </ul>
     </div>
   );
+}
+
+function dateToString(dt) {
+  let d = new Date(dt);
+  return d.getHours() + ":" + d.getMinutes();
 }
 
 class ToggleButton extends React.Component {
@@ -59,4 +73,4 @@ class ToggleButton extends React.Component {
   }
 }
 
-export { ToggleButton, HistoryDisplay };
+export { ToggleButton, LastValue, HistoryDisplay };

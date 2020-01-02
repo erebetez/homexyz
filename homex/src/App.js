@@ -1,6 +1,6 @@
 import React from "react";
 import { ServiceData, Events } from "./provider.js";
-import { ToggleButton, HistoryDisplay } from "./widgets.js";
+import { ToggleButton, LastValue, HistoryDisplay } from "./widgets.js";
 import { Devices } from "./devices.js";
 
 function App() {
@@ -29,10 +29,16 @@ function App() {
 
                 <Events select="fireplace_temp_bottom" last="100">
                   {(eventList, set) => (
-                    <HistoryDisplay
-                      eventList={eventList}
-                      attribute={states.fireplace_temp_bottom.attribute}
-                    ></HistoryDisplay>
+                    <div>
+                      <LastValue>
+                        eventList={eventList}
+                        attribute={states.fireplace_temp_bottom.attribute}
+                      </LastValue>
+                      <HistoryDisplay
+                        eventList={eventList}
+                        attribute={states.fireplace_temp_bottom.attribute}
+                      ></HistoryDisplay>
+                    </div>
                   )}
                 </Events>
 
