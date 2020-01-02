@@ -2,14 +2,15 @@ import React from "react";
 import { LineChart, Line, CartesianGrid, XAxis, YAxis } from "recharts";
 
 function LastValue(props) {
-  if (props.eventList) {
+  console.log(props.eventList);
+  if (props.eventList.length > 0) {
     return (
-      <div>
-        {props.eventList[0]} {props.attribute.unit}
-      </div>
+      <h3 class="badge badge-secondary">
+        {props.eventList[0].value} {props.attribute.unit}
+      </h3>
     );
   } else {
-    return <div>No data</div>;
+    return <div>No data..</div>;
   }
 }
 
@@ -42,7 +43,7 @@ function HistoryDisplay(props) {
 
 function dateToString(dt) {
   let d = new Date(dt);
-  return d.getHours() + ":" + d.getMinutes();
+  return d.toLocaleTimeString();
 }
 
 class ToggleButton extends React.Component {

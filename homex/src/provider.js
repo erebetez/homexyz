@@ -67,30 +67,38 @@ class ServiceData extends React.Component {
   async fetchDevices() {
     let query = "/devices/";
 
-    const response = await fetch(query);
-    const retr = await response.json();
+    try {
+      const response = await fetch(query);
+      const retr = await response.json();
 
-    this.setState({
-      devices: retr.reduce((acc, dev) => {
-        acc[dev.id] = dev;
-        return acc;
-      }, {})
-    });
+      this.setState({
+        devices: retr.reduce((acc, dev) => {
+          acc[dev.id] = dev;
+          return acc;
+        }, {})
+      });
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   async fetchStates() {
     let query = "/states/";
 
-    const response = await fetch(query);
-    const retr = await response.json();
+    try {
+      const response = await fetch(query);
+      const retr = await response.json();
 
-    this.setState({
-      states: retr.reduce((acc, stat) => {
-        acc[stat.key] = stat;
-        return acc;
-      }, {}),
-      loading: false
-    });
+      this.setState({
+        states: retr.reduce((acc, stat) => {
+          acc[stat.key] = stat;
+          return acc;
+        }, {}),
+        loading: false
+      });
+    } catch (e) {
+      console.error(e);
+    }
   }
   render() {
     return this.props.children(
@@ -137,13 +145,17 @@ class Events extends React.Component {
       query += "?last=" + this.props.last + "&type=count";
     }
 
-    const response = await fetch(query);
-    const newEvents = await response.json();
+    try {
+      const response = await fetch(query);
+      const newEvents = await response.json();
 
-    this.setState({
-      loading: false,
-      eventList: newEvents
-    });
+      this.setState({
+        loading: false,
+        eventList: newEvents
+      });
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   async setEvent(origin, value) {

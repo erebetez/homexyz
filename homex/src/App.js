@@ -27,13 +27,13 @@ function App() {
                   )}
                 </Events>
 
-                <Events select="fireplace_temp_bottom" last="100">
+                <Events select="fireplace_temp_bottom" last="10">
                   {(eventList, set) => (
                     <div>
-                      <LastValue>
+                      <LastValue
                         eventList={eventList}
                         attribute={states.fireplace_temp_bottom.attribute}
-                      </LastValue>
+                      ></LastValue>
                       <HistoryDisplay
                         eventList={eventList}
                         attribute={states.fireplace_temp_bottom.attribute}
@@ -64,7 +64,7 @@ function App() {
                   )}
                 </Events>
 
-                <Events select="temperature1" last="100">
+                <Events select="temperature1" last="10">
                   {(eventList, set) => (
                     <HistoryDisplay
                       eventList={eventList}
@@ -73,7 +73,7 @@ function App() {
                   )}
                 </Events>
 
-                <Events select="temperature2" last="100">
+                <Events select="temperature2" last="10">
                   {(eventList, set) => (
                     <HistoryDisplay
                       eventList={eventList}
