@@ -1,36 +1,6 @@
 import React from "react";
 import { LineChart, Line, CartesianGrid, XAxis, YAxis } from "recharts";
 
-class DiscoverButton extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      discovering: false
-    };
-  }
-
-  async discover() {
-    this.setState({ discovering: true });
-    let query = "/discover/";
-
-    await fetch(query);
-
-    this.setState({ discovering: false });
-  }
-
-  render() {
-    if (this.state.discovering) {
-      return <button class="btn btn-outline-primary">Discovering</button>;
-    } else {
-      return (
-        <button class="btn btn-primary" onClick={this.discover.bind(this)}>
-          Discover
-        </button>
-      );
-    }
-  }
-}
-
 function HistoryDisplay(props) {
   let data = props.eventList.map(item => {
     item["parsed"] = Date.parse(item["inserted"]);
