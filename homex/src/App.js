@@ -27,6 +27,15 @@ function App() {
                   )}
                 </Events>
 
+                <Events select="fireplace_temp_bottom" last="100">
+                  {(eventList, set) => (
+                    <HistoryDisplay
+                      eventList={eventList}
+                      attribute={states.fireplace_temp_bottom.attribute}
+                    ></HistoryDisplay>
+                  )}
+                </Events>
+
                 <hr></hr>
                 <h4>Livingroom</h4>
                 <Events select="led1" last="1">
