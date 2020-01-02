@@ -9,6 +9,7 @@ const device = {
   states: {
     button_led1: { type: "button" },
     button_led2: { type: "button" },
+    button_fireplace_fan: { type: "button" },
     button_mock_state: { type: "button" }
   }
 };

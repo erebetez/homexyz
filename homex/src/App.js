@@ -16,8 +16,19 @@ function App() {
               <div>
                 <Devices devices={devices} states={states}></Devices>
                 <hr></hr>
-                <h4>Livingroom</h4>
+                <h4>Fireplace</h4>
+                <Events select="fireplace_fan" last="1">
+                  {(eventList, set) => (
+                    <ToggleButton
+                      name="button_fireplace_fan"
+                      event={eventList[0]}
+                      set={set}
+                    ></ToggleButton>
+                  )}
+                </Events>
 
+                <hr></hr>
+                <h4>Livingroom</h4>
                 <Events select="led1" last="1">
                   {(eventList, set) => (
                     <ToggleButton
@@ -38,7 +49,7 @@ function App() {
                   )}
                 </Events>
 
-                <Events select="temperature1" last="10">
+                <Events select="temperature1" last="100">
                   {(eventList, set) => (
                     <HistoryDisplay
                       eventList={eventList}
@@ -47,7 +58,7 @@ function App() {
                   )}
                 </Events>
 
-                <Events select="temperature2" last="10">
+                <Events select="temperature2" last="100">
                   {(eventList, set) => (
                     <HistoryDisplay
                       eventList={eventList}
@@ -56,7 +67,7 @@ function App() {
                   )}
                 </Events>
 
-                <Events select="humidity1" last="10">
+                <Events select="humidity1" last="100">
                   {(eventList, set) => (
                     <HistoryDisplay
                       eventList={eventList}
