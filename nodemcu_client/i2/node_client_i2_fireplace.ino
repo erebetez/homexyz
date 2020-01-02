@@ -1,8 +1,6 @@
 #include <ArduinoWebsockets.h>
 #include <ESP8266WiFi.h>
 #include <ArduinoJson.h>
-#include <Adafruit_Sensor.h>
-#include <DHT.h>
 #include <DallasTemperature.h>
 #include <OneWire.h>
 
@@ -12,7 +10,7 @@ const char* websockets_server = "ws://moria:3667";
 
 
 // Device properties
-const String id = "i1";
+const String id = "i2";
 const String name = "fireplace";
 const String desc = "Next to fireplace";
 
@@ -21,39 +19,24 @@ String states = "";
 
 // Assign output variables to GPIO pins
 const int output2 = 2;
-const int output4 = 4;
-
-// DHT11
-const int input5 = 5;
-
-
-// KY035
-const int input0 = A0;
-int a0inputVal  = 0;
 
 // DS18B20
-#define ONE_WIRE_BUS 13
+#define ONE_WIRE_BUS 4
 
 // sensor setup
 
 OneWire oneWire(ONE_WIRE_BUS); 
 DallasTemperature sensors(&oneWire);
 
-#define DHTTYPE    DHT11
-
-DHT dht(input5, DHTTYPE);
 
 const uint32_t interval = 30000;
 long lastMillis = 0;
 
 // States
-int output2State = 0;
-int output4State = 0;
+int fanOn = 0;
 
 // Data
-float t1 = 0.0;
-float t2 = 0.0;
-float h = 0.0;
+float tempBottom = 0.0;
 
 using namespace websockets;
 WebsocketsClient client;
@@ -64,23 +47,15 @@ void setup() {
 
   // Initialize the output variables as outputs
   pinMode(output2, OUTPUT);
-  pinMode(output4, OUTPUT);
-  pinMode(input5, INPUT);
   // Set outputs to LOW
-  digitalWrite(output2, LOW);
-  digitalWrite(output4, LOW);
+  digitalWrite(output2, HIGH);
 
-  dht.begin();
   sensors.begin();
-
 
   // Set states
   states = "{";
-  states += "\"led1\": {\"location\": \"livingroom\",\"type\": \"switch\",\"range\": [0,1]},";
-  states += "\"led2\": {\"location\": \"kitchen\",\"type\": \"dimmer\", \"range\": [0,9]},";
-  states += "\"temperature1\": {\"location\": \"livingroom\",\"type\": \"sensor\", \"unit\": \"°C\"},";
-  states += "\"temperature2\": {\"location\": \"livingroom\",\"type\": \"sensor\", \"unit\": \"°C\"},";
-  states += "\"humidity1\": {\"location\": \"livingroom\",\"type\": \"sensor\", \"unit\": \"%\"}";
+  states += "\"fireplace_fan\": {\"location\": \"livingroom\",\"type\": \"switch\",\"range\": [0,1]},";
+  states += "\"fireplace_temp_bottom\": {\"location\": \"fireplace\",\"type\": \"sensor\", \"unit\": \"°C\"}";
   states += "}";
 
   // Connect to wifi
@@ -101,7 +76,6 @@ void setup() {
   Serial.println("");
 
 
-
   // Setup Callbacks
   client.onMessage(onMessageCallback);
   client.onEvent(onEventsCallback);
@@ -110,7 +84,7 @@ void setup() {
 void onMessageCallback(WebsocketsMessage message) {
     Serial.print("Got Message: ");
     Serial.println(message.data());
-    
+
     if (message.data().indexOf("{\"key\":\"") == 0){
 
       // maybe faster to check for key the c way. do json pars only for interesting messages.
@@ -123,40 +97,25 @@ void onMessageCallback(WebsocketsMessage message) {
       const char* key = event["key"];
       const char* transaction_id = event["transaction_id"];
       
-      if (strcmp(key, "led1") == 0) {
+      if (strcmp(key, "fireplace_fan") == 0) {
 
-        int oldValue = output2State;
-        output2State = event["value"];
+        int oldValue = fanOn;
+        fanOn = event["value"];
 
-        if (output2State == 1) {
-          digitalWrite(output2, HIGH);
-        } else {
+        if (fanOn == 1) {
           digitalWrite(output2, LOW);
+        } else {
+          digitalWrite(output2, HIGH);
         }
 
         // NOTE in order to prevent infinit loops between server and client. Last server implementation does not broadcast to sender. So risiko is small now.
-        if (oldValue != output2State) {
-           client.send("{\"key\": \"led1\", \"transaction_id\": \"" + String(transaction_id) + "\", \"value\":" + String(output2State) + "}");
+        if (oldValue != fanOn) {
+           client.send("{\"key\": \"fireplace_fan\", \"transaction_id\": \"" + String(transaction_id) + "\", \"value\":" + String(fanOn) + "}");
         }      
-      }
-      else if (strcmp(key, "led2") == 0) {
-
-        int oldValue = output4State;
-        output4State = event["value"];
-
-        if (output4State == 1) {
-          digitalWrite(output4, HIGH);
-        } else {
-          digitalWrite(output4, LOW);
-        }
-
-        if (oldValue != output4State) {
-          client.send("{\"key\": \"led2\", \"transaction_id\": \"" + String(transaction_id) + "\", \"value\":" + String(output4State) + "}");
-        }
-      } 
+      }      
       else {
            Serial.print("Not interesetd in: ");
-           Serial.print(key);
+           Serial.println(key);
       }
     }
 }
@@ -167,9 +126,8 @@ void onEventsCallback(WebsocketsEvent event, String data) {
         client.send("{\"key\": \"device\", \"value\": {\"id\": \"" + id + "\",\"name\": \"" + name + "\",\"desc\": \"" + desc + "\",\"states\": " + states + "}}");
 
         delay(2000);
-        // send current states of led1 and led2...
-        client.send("{\"key\": \"led1\", \"value\":" + String(output2State) + "}");
-        client.send("{\"key\": \"led2\", \"value\":" + String(output4State) + "}");
+        // send current states
+        client.send("{\"key\": \"fireplace_fan\", \"value\":" + String(fanOn) + "}");        
 
     } else if(event == WebsocketsEvent::ConnectionClosed) {
         Serial.println("Connnection Closed");
@@ -180,22 +138,17 @@ void onEventsCallback(WebsocketsEvent event, String data) {
     }
 }
 
-
 void loop() {
-  webScoketsConnect();
+  webSocketConnect();
 
   long currentMillis = millis();
   if(currentMillis - lastMillis > interval){
-    lastMillis = currentMillis;
-    readDataTemperatureDHT();
+    lastMillis = currentMillis;    
     readDataTemperatureOneWire();
-    readDataHumidity();
   }
 }
 
-
-
-void webScoketsConnect(){
+void webSocketConnect(){
   if(client.available()) {
     client.poll();
   }
@@ -208,24 +161,6 @@ void webScoketsConnect(){
   }
 }
 
-void readDataTemperatureDHT(){
-  // Read temperature as Celsius (the default)
-  float newT = dht.readTemperature();
-
-  if (isnan(newT)) {
-    Serial.println("Failed to read temperature from DHT sensor!");
-    return;
-  }
-
-
-  if (t1 != newT){
-    t1 = newT;
-    Serial.println(t1);
-    client.send("{\"key\": \"temperature1\", \"value\":" + String(t1) + "}");
-  }
-  return;
-}
-
 void readDataTemperatureOneWire(){
   sensors.requestTemperatures();
 
@@ -236,29 +171,10 @@ void readDataTemperatureOneWire(){
     return;
   }
 
-
-  if (t2 != newT){
-    t2 = newT;
-    Serial.println(t2);
-    client.send("{\"key\": \"temperature2\", \"value\":" + String(t2) + "}");
+  if (tempBottom != newT){
+    tempBottom = newT;
+    Serial.println(tempBottom);
+    client.send("{\"key\": \"fireplace_temp_bottom\", \"value\":" + String(tempBottom) + "}");
   }
-  return;
-}
-
-void readDataHumidity(){
-  // Read Humidity
-  float newH = dht.readHumidity();
-
-  if (isnan(newH)) {
-    Serial.println("Failed to read humidity from DHT sensor!");
-    return;
-  }
-
-  if(h != newH) {
-    h = newH;
-    Serial.println(h);
-    client.send("{\"key\": \"humidity1\", \"value\":" + String(h) + "}");
-  }
-
   return;
 }
