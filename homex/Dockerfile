@@ -23,4 +23,4 @@ USER node
 
 EXPOSE 5000
 
-CMD [ "serve", "-s", "buld" ]
+CMD [ "serve", "-s", "build" ]
