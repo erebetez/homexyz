@@ -51,7 +51,7 @@ const connection = function() {
       sendRequest(decision, data.transaction_id);
     }
     if (data.key === "livingroom_light") {
-      fan = data.value;
+      light = data.value;
       let decision = logic();
       sendRequest(decision, data.transaction_id);
     }
@@ -86,3 +86,5 @@ function logic() {
 }
 
 connection();
+
+// TODO add SIGTERM etc.
