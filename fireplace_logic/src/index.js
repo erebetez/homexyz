@@ -51,9 +51,12 @@ const connection = function() {
       sendRequest(decision, data.transaction_id);
     }
     if (data.key === "livingroom_light") {
-      light = data.value;
+      fan = data.value;
       let decision = logic();
       sendRequest(decision, data.transaction_id);
+    }
+    if (data.key === "fireplace_fan") {
+      fan = data.value;
     }
   });
 
@@ -71,15 +74,11 @@ const connection = function() {
 };
 
 function logic() {
-  if (light == 0) {
-    return 0;
-  }
-
-  if (temp >= minTemp && fan === 0 && light == 1) {
+  if (temp >= minTemp && light == 1 && fan == 0) {
     return 1;
   }
 
-  if (temp < minTemp && fan === 1) {
+  if ((temp < minTemp || light == 0) && fan == 1) {
     return 0;
   }
 
