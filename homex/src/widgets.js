@@ -43,7 +43,8 @@ function HistoryDisplay(props) {
 
 function dateToString(dt) {
   let d = new Date(dt);
-  return d.toLocaleTimeString();
+  let s = d.toLocaleTimeString().split(":");
+  return s[0] + ":" + s[1];
 }
 
 class ToggleButton extends React.Component {
