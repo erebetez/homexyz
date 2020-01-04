@@ -19,6 +19,7 @@ String states = "";
 
 // Assign output variables to GPIO pins
 const int output2 = 2;
+const int output5 = 5;
 
 // DS18B20
 #define ONE_WIRE_BUS 4
@@ -34,6 +35,7 @@ long lastMillis = 0;
 
 // States
 int fanOn = 0;
+int lightOn = 2;
 
 // Data
 float tempBottom = 0.0;
@@ -47,6 +49,8 @@ void setup() {
 
   // Initialize the output variables as outputs
   pinMode(output2, OUTPUT);
+  pinMode(output5, INPUT);
+
   // Set outputs to LOW
   digitalWrite(output2, HIGH);
 
@@ -54,7 +58,8 @@ void setup() {
 
   // Set states
   states = "{";
-  states += "\"fireplace_fan\": {\"location\": \"livingroom\",\"type\": \"switch\",\"range\": [0,1]},";
+  states += "\"fireplace_fan\": {\"location\": \"fireplace\",\"type\": \"switch\",\"range\": [0,1]},";
+  states += "\"livingroom_light\": {\"location\": \"livingroom\",\"type\": \"sensor\",\"range\": [0,1]},";
   states += "\"fireplace_temp_bottom\": {\"location\": \"fireplace\",\"type\": \"sensor\", \"unit\": \"°C\"}";
   states += "}";
 
@@ -112,7 +117,7 @@ void onMessageCallback(WebsocketsMessage message) {
         if (oldValue != fanOn) {
            client.send("{\"key\": \"fireplace_fan\", \"transaction_id\": \"" + String(transaction_id) + "\", \"value\":" + String(fanOn) + "}");
         }      
-      }      
+      }
       else {
            Serial.print("Not interesetd in: ");
            Serial.println(key);
@@ -145,6 +150,7 @@ void loop() {
   if(currentMillis - lastMillis > interval){
     lastMillis = currentMillis;    
     readDataTemperatureOneWire();
+    readLightSensor();
   }
 }
 
@@ -158,6 +164,22 @@ void webSocketConnect(){
   else {
     Serial.println("Could not connect to server: '" + String(websockets_server) + "'");
     delay(1000);
+  }
+}
+
+void readLightSensor(){
+  int newValue = digitalRead(output5);
+  // Sensor return HIGH if light is off.
+  if (newValue == HIGH){
+    newValue = 0;
+  } else {
+    newValue = 1;
+  }
+
+  if (lightOn != newValue){
+    lightOn = newValue;
+    Serial.println(newValue);
+    client.send("{\"key\": \"livingroom_light\", \"value\":" + String(lightOn) + "}");
   }
 }
 
