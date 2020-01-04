@@ -19,17 +19,32 @@ function App() {
                 <h4>Fireplace</h4>
                 <Events select="fireplace_fan" last="1">
                   {(eventList, set) => (
-                    <ToggleButton
-                      name="button_fireplace_fan"
-                      event={eventList[0]}
-                      set={set}
-                    ></ToggleButton>
+                    <div>
+                      <span>Fan: </span>
+                      <LastValue
+                        eventList={eventList}
+                        attribute={states.fireplace_fan.attribute}
+                      ></LastValue>
+                    </div>
                   )}
                 </Events>
 
-                <Events select="fireplace_temp_bottom" last="10">
+                <Events select="livingroom_light" last="1">
                   {(eventList, set) => (
                     <div>
+                      <span>Light: </span>
+                      <LastValue
+                        eventList={eventList}
+                        attribute={states.livingroom_light.attribute}
+                      ></LastValue>
+                    </div>
+                  )}
+                </Events>
+
+                <Events select="fireplace_temp_bottom" last="100">
+                  {(eventList, set) => (
+                    <div>
+                      <span>Temp bottom: </span>
                       <LastValue
                         eventList={eventList}
                         attribute={states.fireplace_temp_bottom.attribute}
@@ -64,30 +79,35 @@ function App() {
                   )}
                 </Events>
 
-                <Events select="temperature1" last="10">
+                <Events select="temperature2" last="100">
                   {(eventList, set) => (
-                    <HistoryDisplay
-                      eventList={eventList}
-                      attribute={states.temperature1.attribute}
-                    ></HistoryDisplay>
-                  )}
-                </Events>
-
-                <Events select="temperature2" last="10">
-                  {(eventList, set) => (
-                    <HistoryDisplay
-                      eventList={eventList}
-                      attribute={states.temperature2.attribute}
-                    ></HistoryDisplay>
+                    <div>
+                      <span>Temp corner: </span>
+                      <LastValue
+                        eventList={eventList}
+                        attribute={states.temperature2.attribute}
+                      ></LastValue>
+                      <HistoryDisplay
+                        eventList={eventList}
+                        attribute={states.temperature2.attribute}
+                      ></HistoryDisplay>
+                    </div>
                   )}
                 </Events>
 
                 <Events select="humidity1" last="100">
                   {(eventList, set) => (
-                    <HistoryDisplay
-                      eventList={eventList}
-                      attribute={states.humidity1.attribute}
-                    ></HistoryDisplay>
+                    <div>
+                      <span>Humidity corner: </span>
+                      <LastValue
+                        eventList={eventList}
+                        attribute={states.humidity1.attribute}
+                      ></LastValue>
+                      <HistoryDisplay
+                        eventList={eventList}
+                        attribute={states.humidity1.attribute}
+                      ></HistoryDisplay>
+                    </div>
                   )}
                 </Events>
 
@@ -104,7 +124,7 @@ function App() {
                   )}
                 </Events>
 
-                <Events select="temperature_mock" last="10">
+                <Events select="temperature_mock" last="100">
                   {(eventList, set) => (
                     <React.Fragment>
                       <ul>
