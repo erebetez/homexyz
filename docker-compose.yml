@@ -1,15 +1,22 @@
 version: "3"
 services:
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./static:/srv/www/static
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - homex
+      - homey
+
   homex:
     build: ./homex
     depends_on:
       - homey
-    environment:
-      WEBSERVERHOST: homey
-      WEBSERVERPORT: 3666
-      WEBSOCKETPORT: 3667
     ports:
-      - "5000:5000"
+      - "3500:5000"
 
   homey:
     build: ./homey
