@@ -237,7 +237,7 @@ void readDataTemperatureOneWire(){
     return;
   }
 
-
+  // TODO use treshould i.e 0.5°C. Maybe round value.
   if (t2 != newT){
     t2 = newT;
     Serial.println(t2);

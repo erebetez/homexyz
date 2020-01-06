@@ -135,6 +135,7 @@ const connectionHandler = function () {
 
             ws.on('message', async (message) => {
                 console.log('got: %s', message);
+                // FIXME catch parsing errors.
                 let event = JSON.parse(message);
 
                 switch (event.key) {
