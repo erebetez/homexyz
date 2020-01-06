@@ -63,7 +63,6 @@ class ToggleButton extends React.Component {
     if (this.props.event) {
       return (
         <div>
-          <div>{this.props.event.value}</div>
           <button class="btn btn-secondary" onClick={this.click.bind(this)}>
             Toggle
           </button>

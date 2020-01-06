@@ -25,6 +25,11 @@ function App() {
                         eventList={eventList}
                         attribute={states.fireplace_fan.attribute}
                       ></LastValue>
+                      <ToggleButton
+                        name="fireplace_fan"
+                        event={eventList[0]}
+                        set={set}
+                      ></ToggleButton>
                     </div>
                   )}
                 </Events>
