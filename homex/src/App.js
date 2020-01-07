@@ -23,7 +23,7 @@ function App() {
                       <span>Fan: </span>
                       <LastValue
                         eventList={eventList}
-                        attribute={states.fireplace_fan.attribute}
+                        state={states.fireplace_fan}
                       ></LastValue>
                       <ToggleButton
                         name="fireplace_fan"
@@ -40,7 +40,7 @@ function App() {
                       <span>Light: </span>
                       <LastValue
                         eventList={eventList}
-                        attribute={states.livingroom_light.attribute}
+                        state={states.livingroom_light}
                       ></LastValue>
                     </div>
                   )}
@@ -52,11 +52,11 @@ function App() {
                       <span>Temp bottom: </span>
                       <LastValue
                         eventList={eventList}
-                        attribute={states.fireplace_temp_bottom.attribute}
+                        state={states.fireplace_temp_bottom}
                       ></LastValue>
                       <HistoryDisplay
                         eventList={eventList}
-                        attribute={states.fireplace_temp_bottom.attribute}
+                        state={states.fireplace_temp_bottom}
                       ></HistoryDisplay>
                     </div>
                   )}
@@ -90,11 +90,11 @@ function App() {
                       <span>Temp corner: </span>
                       <LastValue
                         eventList={eventList}
-                        attribute={states.temperature2.attribute}
+                        state={states.temperature2}
                       ></LastValue>
                       <HistoryDisplay
                         eventList={eventList}
-                        attribute={states.temperature2.attribute}
+                        state={states.temperature2}
                       ></HistoryDisplay>
                     </div>
                   )}
@@ -106,11 +106,11 @@ function App() {
                       <span>Humidity corner: </span>
                       <LastValue
                         eventList={eventList}
-                        attribute={states.humidity1.attribute}
+                        state={states.humidity1}
                       ></LastValue>
                       <HistoryDisplay
                         eventList={eventList}
-                        attribute={states.humidity1.attribute}
+                        state={states.humidity1}
                       ></HistoryDisplay>
                     </div>
                   )}

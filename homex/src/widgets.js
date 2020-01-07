@@ -2,11 +2,12 @@ import React from "react";
 import { LineChart, Line, CartesianGrid, XAxis, YAxis } from "recharts";
 
 function LastValue(props) {
-  console.log(props.eventList);
-  if (props.eventList.length > 0) {
+  console.log(props);
+
+  if (props.state && props.eventList.length > 0) {
     return (
       <h3 class="badge badge-secondary">
-        {props.eventList[0].value} {props.attribute.unit}
+        {props.eventList[0].value} {props.state.attribute.unit}
       </h3>
     );
   } else {
@@ -15,6 +16,9 @@ function LastValue(props) {
 }
 
 function HistoryDisplay(props) {
+  if (props.state === undefined) {
+    return <div>state not existing</div>;
+  }
   let data = props.eventList.map(item => {
     item["parsed"] = Date.parse(item["inserted"]);
     return item;
@@ -34,7 +38,7 @@ function HistoryDisplay(props) {
           reversed="true"
           tickFormatter={dateToString}
         />
-        <YAxis dataKey="value" unit={props.attribute.unit} />
+        <YAxis dataKey="value" unit={props.state.attribute.unit} />
         <Line type="monotone" dataKey="value" stroke="#8884d8" />
       </LineChart>
     </div>
