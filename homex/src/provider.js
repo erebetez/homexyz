@@ -1,6 +1,9 @@
 import React from "react";
 
-const socket = new WebSocket("ws://moria:3667");
+// FIXME pass host from start script. host of homey from outside the docker network.
+const socket = new WebSocket("ws://localhost:3667");
+
+const base = "/api";
 
 const device = {
   id: "w1",
@@ -15,7 +18,7 @@ const device = {
   }
 };
 
-socket.addEventListener("open", function(event) {
+socket.addEventListener("open", function (event) {
   socket.send(
     JSON.stringify({
       key: "device",
@@ -66,10 +69,10 @@ class ServiceData extends React.Component {
   }
 
   async fetchDevices() {
-    let query = "/devices/";
+    let query = base + "/devices/";
+    const response = await fetch(query);
 
     try {
-      const response = await fetch(query);
       const retr = await response.json();
 
       this.setState({
@@ -80,11 +83,12 @@ class ServiceData extends React.Component {
       });
     } catch (e) {
       console.error(e);
+      console.error(response);
     }
   }
 
   async fetchStates() {
-    let query = "/states/";
+    let query = base + "/states/";
 
     try {
       const response = await fetch(query);
@@ -141,7 +145,7 @@ class Events extends React.Component {
   async fetchEvent() {
     this.setState({ loading: true });
 
-    let query = "/events/" + this.props.select;
+    let query = base + "/events/" + this.props.select;
     if (this.props.last) {
       query += "?last=" + this.props.last + "&type=count";
     }

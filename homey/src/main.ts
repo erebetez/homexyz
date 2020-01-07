@@ -172,7 +172,7 @@ const startWss = function () {
     wss.on('connection', connectionHandler.add);
 }
 
-app.get('/devices', (req, res) => {
+app.get('/api/devices', (req, res) => {
     getDevices((err, retr) => {
         if (err) {
             dbError(err);
@@ -184,7 +184,7 @@ app.get('/devices', (req, res) => {
 })
 
 
-app.get('/states', (req, res) => {
+app.get('/api/states', (req, res) => {
     getStates((err, retr) => {
         if (err) {
             dbError(err);
@@ -196,7 +196,7 @@ app.get('/states', (req, res) => {
 })
 
 
-app.get('/:id/state', (req, res) => {
+app.get('/api/:id/state', (req, res) => {
     getDeviceById(req.params.id, (err, retr) => {
         if (err) {
             dbError(err);
@@ -207,7 +207,7 @@ app.get('/:id/state', (req, res) => {
     })
 })
 
-app.get('/events/:key', (req, res) => {
+app.get('/api/events/:key', (req, res) => {
 
     getEvents(req.params.key, req.query, (err, retr) => {
         if (err) {
@@ -219,7 +219,7 @@ app.get('/events/:key', (req, res) => {
     })
 })
 
-app.get('/logs', (req, res) => {
+app.get('/api/logs', (req, res) => {
     getLogs((err, retr) => {
         if (err) {
             dbError(err);

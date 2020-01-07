@@ -1,7 +1,7 @@
-FROM node:12
+FROM node:12-alpine AS base
 
 # Create app directory
-WORKDIR /usr/src/app
+#WORKDIR /usr/src/app
 
 # Install app dependencies
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
@@ -17,10 +17,7 @@ COPY . .
 
 RUN npm run build
 
-RUN npm install -g serve
-
-USER node
-
-EXPOSE 5000
-
-CMD [ "serve", "-s", "build" ]
+FROM nginx:alpine
+# Copy needed files
+COPY nginx/default.conf /etc/nginx/conf.d/default.conf
+COPY --from=base build /usr/share/nginx/html
