@@ -12,18 +12,11 @@ import { setupNofication, dbError, dbLog, dbEnd } from "./db";
 const port = 3666;
 const ws_port = 3667
 
+const devicePingInterval = 60 * 60 * 5;
+
 // TODO's
 
 // - SSL for https
-// - mDNS / bonjour
-
-
-interface Event {
-    key: string;
-    transaction_id: string;
-    value: object;
-    trail: object;
-}
 
 
 const ensureEventObject = function (event) {
@@ -58,7 +51,7 @@ const transactionHandler = function () {
             await storeEvent(event);
             finish();
         } else {
-            // FIXME queue item is closed before new request was send...
+            // FIXME what if no return of this trasaction happens. Add timeout?
             transactionTrails[event.transaction_id] = trailList;
             getDeviceByKey(event.key, (err, retr) => {
                 if (err) {
@@ -109,6 +102,14 @@ const connectionHandler = function () {
         });
     }
 
+    const broadcast = function (payload) {
+        let data = JSON.stringify(payload);
+
+        Object.keys(connections).forEach((id) => {
+            send(id, data);
+        });
+    }
+
     const cleanup = function () {
         Object.keys(connections).forEach((id) => {
             const client = connections[id];
@@ -119,7 +120,7 @@ const connectionHandler = function () {
         });
     }
 
-    // TODO periodicaly ping client to check for up. 
+    // TODO periodicaly ping client to check for up. close is not always called by client...
 
     return {
         add: (ws, info) => {
@@ -154,10 +155,24 @@ const connectionHandler = function () {
                     }
                 }
             });
+
+            setInterval(() => {
+                ws.ping(() => {
+                    let gotIt = false;
+                    setTimeout(() => {
+                        if (!gotIt) {
+                            ws.close();
+                        }
+                    }, 5000);
+                    ws.on('pong', () => {
+                        gotIt = true;
+                    });
+                });
+            }, devicePingInterval)
+
         },
-        broadcast: (sender: any, payload: any) => {
-            braodcastButSender(sender, payload);
-        },
+        broadcast: broadcast,
+        braodcastButSender: braodcastButSender,
         sendTo: (device: any, payload: any) => {
             send(device.id, JSON.stringify(payload));
         }
@@ -166,9 +181,7 @@ const connectionHandler = function () {
 
 
 const startWss = function () {
-    // TODO could start with option to not track clients. is handlen in connection handler.
-    const wss = new WebSocket.Server({ port: ws_port });
-
+    const wss = new WebSocket.Server({ server: http, port: ws_port, clientTracking: false });
     wss.on('connection', connectionHandler.add);
 }
 
@@ -239,14 +252,14 @@ function notificationHandler(channel, row) {
                     dbError(err);
                 } else {
                     delete row.trail; // do not broadcast trail.
-                    connectionHandler.broadcast(retr.rows[0], row);
+                    connectionHandler.braodcastButSender(retr.rows[0], row);
                 }
             });
 
             break;
         case 'devices':
             // TODO don't use butSender function. send to everyone including sender.
-            connectionHandler.broadcast(row, { key: 'devices', value: row });
+            connectionHandler.broadcast({ key: 'devices', value: row });
             break;
         default:
             dbError(Error("Invalid notification handler. " + channel));
