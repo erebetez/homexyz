@@ -131,15 +131,32 @@ function App() {
 
                 <Events select="temperature_mock" last="100">
                   {(eventList, set) => (
-                    <React.Fragment>
-                      <ul>
-                        {eventList.map(item => (
-                          <li key={item.inserted}>
-                            {item.inserted} ": " {item.value}
-                          </li>
-                        ))}
-                      </ul>
-                    </React.Fragment>
+                    <div>
+                      <span>temperature_mock corner: </span>
+                      <LastValue
+                        eventList={eventList}
+                        state={states.temperature_mock}
+                      ></LastValue>
+                      <HistoryDisplay
+                        eventList={eventList}
+                        state={states.temperature_mock}
+                      ></HistoryDisplay>
+                    </div>
+                  )}
+                </Events>
+                <Events select="possible_error_mock" last="100">
+                  {(eventList, set) => (
+                    <div>
+                      <span>possible_error_mock corner: </span>
+                      <LastValue
+                        eventList={eventList}
+                        state={states.possible_error_mock}
+                      ></LastValue>
+                      <HistoryDisplay
+                        eventList={eventList}
+                        state={states.possible_error_mock}
+                      ></HistoryDisplay>
+                    </div>
                   )}
                 </Events>
               </div>

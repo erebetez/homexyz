@@ -10,6 +10,7 @@ const device = {
     name: "mock device",
     states: {
         temperature_mock: { location: "kitchen", unit: "°C" },
+        possible_error_mock: { location: "livingroom", unit: "happy" },
         light_top: { location: "other room", type: "switch" }
     }
 }
@@ -17,7 +18,7 @@ const device = {
 let someState = 0;
 
 const connection = function () {
-    const ws = new WebSocket('ws://192.168.0.6:3667');
+    const ws = new WebSocket('ws://localhost:3667');
 
     ws.on('open', () => {
         ws.send(JSON.stringify({
@@ -25,11 +26,12 @@ const connection = function () {
             value: device
         }));
 
-        ws.send(JSON.stringify({
-            key: 'light_top',
-            value: someState
-        }));
-
+        setTimeout(() => {
+            ws.send(JSON.stringify({
+                key: 'light_top',
+                value: someState
+            }));
+        }, 1000)
     });
 
     ws.on('error', err => {
@@ -72,6 +74,21 @@ const connection = function () {
             value: newVal
         }));
     }, 5000)
+
+    setInterval(() => {
+        let newVal = Math.ceil(Math.random() * 100);
+
+        let isError = Math.random() > 0.8;
+
+        if (isError) {
+            newVal = null;
+        }
+
+        ws.send(JSON.stringify({
+            key: 'possible_error_mock',
+            value: newVal
+        }));
+    }, 5500)
 
 }
 
