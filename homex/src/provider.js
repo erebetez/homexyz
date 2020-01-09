@@ -1,7 +1,6 @@
 import React from "react";
 
-// FIXME pass host from start script. host of homey from outside the docker network.
-const socket = new WebSocket("ws://localhost:3667");
+const socket = new WebSocket("ws://" + window.location.hostname + ":3667");
 
 const base = "/api";
 
@@ -129,12 +128,11 @@ class Events extends React.Component {
     socket.addEventListener(
       "message",
       listenerHandler(this.props.select, data => {
-        console.log(data);
         let l = this.state.eventList;
-        console.log(l);
 
-        // FIXME only pop if < then this.props.last
-        l.pop();
+        if (l.length > this.props.last) {
+          l.pop();
+        }
 
         l.unshift(data);
         this.setState({ eventList: l });
