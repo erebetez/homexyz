@@ -29,6 +29,16 @@ const connection = function () {
       })
     );
 
+    // register interested parameter
+    ['fireplace_fan', 'livingroom_light', 'fireplace_temp_bottom'].forEach((key) => {
+      ws.send(JSON.stringify({
+        key: 'register',
+        value: {
+          id: device.id,
+          key: key
+        }
+      }));
+    })
   });
 
   // TODO should request or get fan state on 'open'
