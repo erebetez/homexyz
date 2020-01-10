@@ -6,7 +6,7 @@ services:
     depends_on:
       - homey
     ports:
-      - "80:80"
+      - "8066:80"
 
   logic:
     build: ./logic
