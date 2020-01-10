@@ -167,10 +167,9 @@ void onEventsCallback(WebsocketsEvent event, String data) {
         client.send("{\"key\": \"device\", \"value\": {\"id\": \"" + id + "\",\"name\": \"" + name + "\",\"desc\": \"" + desc + "\",\"states\": " + states + "}}");
 
         delay(2000);
-        // send current states of led1 and led2.
-        // TODO get last state from persistent store...
-        client.send("{\"key\": \"led1\", \"value\":" + String(output2State) + "}");
-        client.send("{\"key\": \"led2\", \"value\":" + String(output4State) + "}");
+        // TODO register both leds
+        client.send("{\"key\": \"register\", \"value\": {\"key\": \"led1\", \"id\":" + id + "}}");
+        client.send("{\"key\": \"register\", \"value\": {\"key\": \"led2\", \"id\":" + id + "}}");
 
     } else if(event == WebsocketsEvent::ConnectionClosed) {
         Serial.println("Connnection Closed");

@@ -131,8 +131,8 @@ void onEventsCallback(WebsocketsEvent event, String data) {
         client.send("{\"key\": \"device\", \"value\": {\"id\": \"" + id + "\",\"name\": \"" + name + "\",\"desc\": \"" + desc + "\",\"states\": " + states + "}}");
 
         delay(2000);
-        // send current states
-        client.send("{\"key\": \"fireplace_fan\", \"value\":" + String(fanOn) + "}");        
+        // send register fireplace_fan
+        client.send("{\"key\": \"register\", \"value\": {\"key\": \"fireplace_fan\", \"id\":" + id + "}}");
 
     } else if(event == WebsocketsEvent::ConnectionClosed) {
         Serial.println("Connnection Closed");
