@@ -20,7 +20,7 @@ services:
     environment:
       PGUSER: homez
       PGHOST: homez
-      PGPASSWORD: homez123
+      PGPASSWORD: homez-1
       PGDATABASE: homez
       NODE_ENV: production
     ports:
