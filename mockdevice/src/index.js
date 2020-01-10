@@ -26,12 +26,13 @@ const connection = function () {
             value: device
         }));
 
-        setTimeout(() => {
-            ws.send(JSON.stringify({
-                key: 'light_top',
-                value: someState
-            }));
-        }, 1000)
+        ws.send(JSON.stringify({
+            key: 'register',
+            value: {
+                id: device.id,
+                key: 'light_top'
+            }
+        }));
     });
 
     ws.on('error', err => {
