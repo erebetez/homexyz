@@ -43,7 +43,7 @@ class ServiceData extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      err: false, // TODO ...
+      err: false,
       loading: true,
       devices: {},
       states: {}
@@ -68,44 +68,42 @@ class ServiceData extends React.Component {
   }
 
   async fetchDevices() {
-    let query = base + "/devices/";
-    const response = await fetch(query);
+    let query = "/devices/";
 
-    try {
-      const retr = await response.json();
-
-      this.setState({
-        devices: retr.reduce((acc, dev) => {
-          acc[dev.id] = dev;
-          return acc;
-        }, {})
-      });
-    } catch (e) {
-      console.error(e);
-      console.error(response);
-    }
+    fetchService(query, (err, retr) => {
+      if (err) {
+        this.setState({ err });
+      } else {
+        this.setState({
+          devices: retr.reduce((acc, dev) => {
+            acc[dev.id] = dev;
+            return acc;
+          }, {})
+        });
+      }
+    });
   }
 
-  async fetchStates() {
-    let query = base + "/states/";
+  fetchStates() {
+    let query = "/states/";
 
-    try {
-      const response = await fetch(query);
-      const retr = await response.json();
-
-      this.setState({
-        states: retr.reduce((acc, stat) => {
-          acc[stat.key] = stat;
-          return acc;
-        }, {}),
-        loading: false
-      });
-    } catch (e) {
-      console.error(e);
-    }
+    fetchService(query, (err, retr) => {
+      if (err) {
+        this.setState({ err });
+      } else {
+        this.setState({
+          states: retr.reduce((acc, stat) => {
+            acc[stat.key] = stat;
+            return acc;
+          }, {}),
+          loading: false
+        });
+      }
+    });
   }
   render() {
     return this.props.children(
+      this.state.err,
       this.state.loading,
       this.state.devices,
       this.state.states
@@ -143,22 +141,21 @@ class Events extends React.Component {
   async fetchEvent() {
     this.setState({ loading: true });
 
-    let query = base + "/events/" + this.props.select;
+    let query = "/events/" + this.props.select;
     if (this.props.last) {
       query += "?last=" + this.props.last + "&type=count";
     }
 
-    try {
-      const response = await fetch(query);
-      const newEvents = await response.json();
-
-      this.setState({
-        loading: false,
-        eventList: newEvents
-      });
-    } catch (e) {
-      console.error(e);
-    }
+    fetchService(query, (err, newEvents) => {
+      if (err) {
+        this.setState({ err });
+      } else {
+        this.setState({
+          loading: false,
+          eventList: newEvents
+        });
+      }
+    })
   }
 
   async setEvent(origin, value) {
@@ -173,7 +170,23 @@ class Events extends React.Component {
   }
 
   render() {
-    return this.props.children(this.state.eventList, this.setEvent.bind(this));
+    return this.props.children(this.state.err, this.state.eventList, this.setEvent.bind(this));
+  }
+}
+
+async function fetchService(query, cb) {
+  const response = await fetch(base + query);
+
+  if (response.status !== 200) {
+    cb(Error(response.statusText + ": " + response.url), undefined);
+    return;
+  }
+
+  try {
+    let retr = await response.json();
+    cb(undefined, retr);
+  } catch (e) {
+    cb(e, undefined)
   }
 }
 

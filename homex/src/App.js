@@ -8,8 +8,12 @@ function App() {
     <div className="App" class="container">
       <h1>HomeX</h1>
       <ServiceData>
-        {(loading, devices, states) => {
-          if (loading) {
+        {(err, loading, devices, states) => {
+          if (err) {
+            return (<div class="alert alert-danger" role="alert">
+              {err.message}
+            </div>);
+          } else if (loading) {
             return <div>Loading...</div>;
           } else {
             return (
@@ -18,7 +22,7 @@ function App() {
                 <hr></hr>
                 <h4>Fireplace</h4>
                 <Events select="fireplace_fan" last="1">
-                  {(eventList, set) => (
+                  {(err, eventList, set) => (
                     <div>
                       <span>Fan: </span>
                       <LastValue
@@ -35,7 +39,7 @@ function App() {
                 </Events>
 
                 <Events select="livingroom_light" last="1">
-                  {(eventList, set) => (
+                  {(err, eventList, set) => (
                     <div>
                       <span>Light: </span>
                       <LastValue
@@ -47,7 +51,7 @@ function App() {
                 </Events>
 
                 <Events select="fireplace_temp_bottom" last="100">
-                  {(eventList, set) => (
+                  {(err, eventList, set) => (
                     <div>
                       <span>Temp bottom: </span>
                       <LastValue
@@ -65,7 +69,7 @@ function App() {
                 <hr></hr>
                 <h4>Livingroom</h4>
                 <Events select="led1" last="1">
-                  {(eventList, set) => (
+                  {(err, eventList, set) => (
                     <ToggleButton
                       name="button_led1"
                       event={eventList[0]}
@@ -75,7 +79,7 @@ function App() {
                 </Events>
 
                 <Events select="led2" last="1">
-                  {(eventList, set) => (
+                  {(err, eventList, set) => (
                     <ToggleButton
                       name="button_led2"
                       event={eventList[0]}
@@ -85,7 +89,7 @@ function App() {
                 </Events>
 
                 <Events select="temperature2" last="100">
-                  {(eventList, set) => (
+                  {(err, eventList, set) => (
                     <div>
                       <span>Temp corner: </span>
                       <LastValue
@@ -101,7 +105,7 @@ function App() {
                 </Events>
 
                 <Events select="humidity1" last="100">
-                  {(eventList, set) => (
+                  {(err, eventList, set) => (
                     <div>
                       <span>Humidity corner: </span>
                       <LastValue
@@ -120,7 +124,7 @@ function App() {
                 <h4>Mockdevice</h4>
 
                 <Events select="light_top" last="1">
-                  {(eventList, set) => (
+                  {(err, eventList, set) => (
                     <ToggleButton
                       name="button_mock_state"
                       event={eventList[0]}
@@ -130,7 +134,7 @@ function App() {
                 </Events>
 
                 <Events select="temperature_mock" last="100">
-                  {(eventList, set) => (
+                  {(err, eventList, set) => (
                     <div>
                       <span>temperature_mock corner: </span>
                       <LastValue
@@ -145,7 +149,7 @@ function App() {
                   )}
                 </Events>
                 <Events select="possible_error_mock" last="100">
-                  {(eventList, set) => (
+                  {(err, eventList, set) => (
                     <div>
                       <span>possible_error_mock corner: </span>
                       <LastValue
