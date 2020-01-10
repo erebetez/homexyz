@@ -169,7 +169,6 @@ const connectionHandler = function () {
                     });
                 });
             }, devicePingInterval)
-
         },
         broadcast: broadcast,
         braodcastButSender: braodcastButSender,
@@ -279,15 +278,19 @@ http.listen(port, "0.0.0.0", () => {
     });
 })
 
-process.on('SIGINT', (code) => {
+process.on('SIGINT', async (code) => {
+    await houskeeping();
     process.exit();
 });
 
-process.on('SIGTERM', (code) => {
+process.on('SIGTERM', async (code) => {
+    await houskeeping();
     process.exit();
 });
 
-process.on('exit', (code) => {
+async function houskeeping() {
     http.close();
+    // set all devices to 'down'
+    await updateDeviceState(undefined, 'down');
     dbEnd();
-});
+}

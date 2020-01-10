@@ -61,8 +61,13 @@ async function storeStates(client, device) {
 }
 
 async function updateDeviceState(id, newState) {
-    const text = 'UPDATE devices SET status = $2 WHERE id = $1';
-    const values = [id, newState];
+    let text = 'UPDATE devices SET status = $1';
+    let values = [newState];
+
+    if (id) {
+        text += " WHERE id = $2";
+        values.push(id);
+    }
 
     try {
         await db().query(text, values);
