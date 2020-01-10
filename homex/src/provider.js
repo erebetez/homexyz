@@ -24,7 +24,6 @@ socket.addEventListener("open", function (event) {
       origin: false,
       transaction_id: false,
       value: device
-      // inserted: new Date //?
     })
   );
 });
@@ -123,6 +122,17 @@ class Events extends React.Component {
 
   componentDidMount() {
     this.fetchEvent();
+
+    socket.send(
+      JSON.stringify({
+        key: "register",
+        value: {
+          id: device.id,
+          key: this.props.select
+        }
+      })
+    );
+
     socket.addEventListener(
       "message",
       listenerHandler(this.props.select, data => {
