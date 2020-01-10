@@ -11,14 +11,15 @@ const device = {
   }
 };
 
+const startTemp = 60;
 const minTemp = 50;
 
 let temp = 0;
 let light = 0;
 let fan = 0;
 
-const connection = function() {
-  const ws = new WebSocket("ws://moria:3667");
+const connection = function () {
+  const ws = new WebSocket("ws://homey:3667");
 
   ws.on("open", () => {
     ws.send(
@@ -27,6 +28,7 @@ const connection = function() {
         value: device
       })
     );
+
   });
 
   // TODO should request or get fan state on 'open'
@@ -74,7 +76,7 @@ const connection = function() {
 };
 
 function logic() {
-  if (temp >= minTemp && light == 1 && fan == 0) {
+  if (temp >= startTemp && light == 1 && fan == 0) {
     return 1;
   }
 
@@ -87,4 +89,10 @@ function logic() {
 
 connection();
 
-// TODO add SIGTERM etc.
+process.on('SIGINT', (code) => {
+  process.exit();
+});
+
+process.on('SIGTERM', (code) => {
+  process.exit();
+});
