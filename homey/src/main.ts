@@ -76,6 +76,7 @@ q.error(function (err, task) {
 
 const connectionHandler = function () {
     let connections = {};
+    let registrations = {};
 
     const isOpen = function (client) {
         return (client && client.readyState === WebSocket.OPEN)
@@ -92,14 +93,17 @@ const connectionHandler = function () {
         }
     }
 
-    const braodcastButSender = function (sender, payload) {
+    const braodcastButSender = function (requestId, payload) {
         let data = JSON.stringify(payload);
+        let reg = registrations[payload.key];
 
-        Object.keys(connections).forEach((id) => {
-            if (id !== sender.id) {
-                send(id, data);
-            }
-        });
+        if (reg) {
+            Object.keys(reg).forEach((id) => {
+                if (requestId != id) {
+                    send(id, data);
+                }
+            });
+        }
     }
 
     const broadcast = function (payload) {
@@ -114,13 +118,19 @@ const connectionHandler = function () {
         Object.keys(connections).forEach((id) => {
             const client = connections[id];
             if (!isOpen(client)) {
+
+                // remove registrations
+                Object.keys(registrations).forEach((key) => {
+                    delete registrations[key][id];
+                })
+
+                // remove connection
+                delete connections[id];
                 updateDeviceState(id, 'down');
                 dbLog('INFO', `Client ${id} closed connection.`, id, null, null);
             }
         });
     }
-
-    // TODO periodicaly ping client to check for up. close is not always called by client...
 
     return {
         add: (ws, info) => {
@@ -147,6 +157,34 @@ const connectionHandler = function () {
                         connections[device.id] = ws;
 
                         await storeIot(device);
+
+                        break;
+                    }
+                    case 'register': {
+                        let request = event.value;
+
+                        // TODO check if request key actually exists.
+
+                        let reg = registrations[request.key];
+                        if (!reg) {
+                            reg = {};
+                        }
+                        reg[request.id] = true;
+                        registrations[request.key] = reg;
+
+                        // send current value back
+                        getEvents(request.key, {
+                            type: 'count',
+                            last: 1
+                        }, (err, retr) => {
+                            if (err) {
+                                dbError(err);
+                            } else if (retr.rowCount > 0) {
+                                send(request.id, JSON.stringify(retr.rows[0]))
+                            } else {
+                                console.log(`Ignore, no data yet for ${request.key}`);
+                            }
+                        })
                         break;
                     }
                     default: {
