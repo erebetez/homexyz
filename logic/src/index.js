@@ -18,7 +18,7 @@ let temp = 0;
 let light = 0;
 let fan = 0;
 
-const connection = function () {
+const connection = function() {
   const ws = new WebSocket("ws://homey:3667");
 
   ws.on("open", () => {
@@ -30,15 +30,19 @@ const connection = function () {
     );
 
     // register interested parameter
-    ['fireplace_fan', 'livingroom_light', 'fireplace_temp_bottom'].forEach((key) => {
-      ws.send(JSON.stringify({
-        key: 'register',
-        value: {
-          id: device.id,
-          key: key
-        }
-      }));
-    })
+    ["fireplace_fan", "livingroom_light", "fireplace_temp_bottom"].forEach(
+      key => {
+        ws.send(
+          JSON.stringify({
+            key: "register",
+            value: {
+              id: device.id,
+              key: key
+            }
+          })
+        );
+      }
+    );
   });
 
   // TODO should request or get fan state on 'open'
@@ -78,6 +82,7 @@ const connection = function () {
         JSON.stringify({
           key: "fireplace_fan",
           transaction_id: transaction_id,
+          trail: { origin: "fireplace_logic_request" },
           value: decision
         })
       );
@@ -99,10 +104,10 @@ function logic() {
 
 connection();
 
-process.on('SIGINT', (code) => {
+process.on("SIGINT", code => {
   process.exit();
 });
 
-process.on('SIGTERM', (code) => {
+process.on("SIGTERM", code => {
   process.exit();
 });
