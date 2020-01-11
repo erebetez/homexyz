@@ -10,9 +10,11 @@ function App() {
       <ServiceData>
         {(err, loading, devices, states) => {
           if (err) {
-            return (<div class="alert alert-danger" role="alert">
-              {err.message}
-            </div>);
+            return (
+              <div class="alert alert-danger" role="alert">
+                {err.message}
+              </div>
+            );
           } else if (loading) {
             return <div>Loading...</div>;
           } else {
@@ -30,7 +32,7 @@ function App() {
                         state={states.fireplace_fan}
                       ></LastValue>
                       <ToggleButton
-                        name="fireplace_fan"
+                        name="button_fireplace_fan"
                         event={eventList[0]}
                         set={set}
                       ></ToggleButton>

@@ -17,7 +17,7 @@ const device = {
   }
 };
 
-socket.addEventListener("open", function (event) {
+socket.addEventListener("open", function(event) {
   socket.send(
     JSON.stringify({
       key: "device",
@@ -165,7 +165,7 @@ class Events extends React.Component {
           eventList: newEvents
         });
       }
-    })
+    });
   }
 
   async setEvent(origin, value) {
@@ -180,7 +180,11 @@ class Events extends React.Component {
   }
 
   render() {
-    return this.props.children(this.state.err, this.state.eventList, this.setEvent.bind(this));
+    return this.props.children(
+      this.state.err,
+      this.state.eventList,
+      this.setEvent.bind(this)
+    );
   }
 }
 
@@ -196,7 +200,7 @@ async function fetchService(query, cb) {
     let retr = await response.json();
     cb(undefined, retr);
   } catch (e) {
-    cb(e, undefined)
+    cb(e, undefined);
   }
 }
 
