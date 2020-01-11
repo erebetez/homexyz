@@ -186,7 +186,8 @@ void readDataTemperatureOneWire(){
 
   if (newT == -127) {
     Serial.println("Failed to read temperature from DS18B20 sensor!");
-    client.send("{\"key\": \"fireplace_temp_bottom\", \"value\":null}");
+    client.send("{\"key\": \"fireplace_temp_bottom\", \"value\": null}");
+    client.send("{\"key\": \"log\", \"value\": {\"id\": " + id + ", \"key\": \"fireplace_temp_bottom\", \"message\": \"Failed to read temperature from DS18B20 sensor!\" }}");
     return;
   }
 
