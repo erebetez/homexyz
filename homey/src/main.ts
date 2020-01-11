@@ -12,7 +12,7 @@ import { setupNofication, dbError, dbLog, dbEnd } from "./db";
 const port = 3666;
 const ws_port = 3667
 
-const devicePingInterval = 60 * 60 * 5;
+const devicePingInterval = 1000 * 60 * 60 * 5;
 
 // TODO's
 
