@@ -214,6 +214,7 @@ void readDataTemperatureDHT(){
 
   if (isnan(newT)) {
     Serial.println("Failed to read temperature from DHT sensor!");
+    client.send("{\"key\": \"temperature1\", \"value\":null}");
     return;
   }
 
@@ -233,6 +234,7 @@ void readDataTemperatureOneWire(){
 
   if (newT == -127) {
     Serial.println("Failed to read temperature from DS18B20 sensor!");
+    client.send("{\"key\": \"temperature2\", \"value\":null}");
     return;
   }
 
@@ -251,6 +253,7 @@ void readDataHumidity(){
 
   if (isnan(newH)) {
     Serial.println("Failed to read humidity from DHT sensor!");
+    client.send("{\"key\": \"humidity1\", \"value\":null}");
     return;
   }
 

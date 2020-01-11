@@ -19,7 +19,7 @@ String states = "";
 
 // Assign output variables to GPIO pins
 const int output2 = 2;
-const int output5 = 5;
+const int input5 = 5;
 
 // DS18B20
 #define ONE_WIRE_BUS 4
@@ -49,7 +49,7 @@ void setup() {
 
   // Initialize the output variables as outputs
   pinMode(output2, OUTPUT);
-  pinMode(output5, INPUT);
+  pinMode(input5, INPUT);
 
   // Set outputs to LOW
   digitalWrite(output2, HIGH);
@@ -104,7 +104,6 @@ void onMessageCallback(WebsocketsMessage message) {
       
       if (strcmp(key, "fireplace_fan") == 0) {
 
-        int oldValue = fanOn;
         fanOn = event["value"];
 
         if (fanOn == 1) {
@@ -113,10 +112,7 @@ void onMessageCallback(WebsocketsMessage message) {
           digitalWrite(output2, HIGH);
         }
 
-        // NOTE in order to prevent infinit loops between server and client. Last server implementation does not broadcast to sender. So risiko is small now.
-        if (oldValue != fanOn) {
-           client.send("{\"key\": \"fireplace_fan\", \"transaction_id\": \"" + String(transaction_id) + "\", \"value\":" + String(fanOn) + "}");
-        }      
+        client.send("{\"key\": \"fireplace_fan\", \"transaction_id\": \"" + String(transaction_id) + "\", \"value\":" + String(fanOn) + "}");
       }
       else {
            Serial.print("Not interesetd in: ");
@@ -168,7 +164,7 @@ void webSocketConnect(){
 }
 
 void readLightSensor(){
-  int newValue = digitalRead(output5);
+  int newValue = digitalRead(input5);
   // Sensor return HIGH if light is off.
   if (newValue == HIGH){
     newValue = 0;
@@ -190,6 +186,7 @@ void readDataTemperatureOneWire(){
 
   if (newT == -127) {
     Serial.println("Failed to read temperature from DS18B20 sensor!");
+    client.send("{\"key\": \"fireplace_temp_bottom\", \"value\":null}");
     return;
   }
 
