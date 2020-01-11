@@ -152,8 +152,17 @@ const connectionHandler = (function() {
 
       ws.on("message", async message => {
         console.log("got: %s", message);
-        // FIXME catch parsing errors.
-        let event = JSON.parse(message);
+
+        let event = undefined;
+        try {
+          event = JSON.parse(message);
+        } catch (err) {
+          dbError(err, { message: message });
+        }
+
+        if (event === undefined) {
+          return;
+        }
 
         switch (event.key) {
           case "device": {
@@ -164,6 +173,12 @@ const connectionHandler = (function() {
 
             await storeIot(device);
 
+            break;
+          }
+          case "log": {
+            let log = event.value;
+            // TODO allow default values.
+            dbLog(log.type, log.message, log.id, log.key, log.irritants);
             break;
           }
           case "register": {
