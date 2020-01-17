@@ -1,4 +1,5 @@
 import React from "react";
+import { sendEvent } from "./provider.js";
 import { LineChart, Line, CartesianGrid, XAxis, YAxis } from "recharts";
 
 function LastValue(props) {
@@ -60,7 +61,7 @@ class ToggleButton extends React.Component {
       val = 0;
     }
 
-    this.props.set(this.props.name, val);
+    sendEvent(this.props.event.key, val, this.props.name);
   }
 
   render() {

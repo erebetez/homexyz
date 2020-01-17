@@ -182,19 +182,19 @@ class Events extends React.Component {
     })
   }
 
-  async setEvent(origin, value) {
-    socket.send(
-      JSON.stringify({
-        key: this.props.select,
-        trail: { origin: origin },
-        value: value
-      })
-    );
-  }
-
   render() {
-    return this.props.children(this.state.err, this.state.eventList, this.setEvent.bind(this));
+    return this.props.children(this.state.err, this.state.eventList);
   }
+}
+
+function sendEvent(key, value, origin) {
+  socket.send(
+    JSON.stringify({
+      key: key,
+      trail: { origin: origin || "button" },
+      value: value
+    })
+  );
 }
 
 async function fetchService(query, cb) {
@@ -213,4 +213,4 @@ async function fetchService(query, cb) {
   }
 }
 
-export { ServiceData, Events };
+export { ServiceData, Events, sendEvent };

@@ -22,7 +22,7 @@ function App() {
                 <hr></hr>
                 <h4>Fireplace</h4>
                 <Events select="fireplace_fan" last="1">
-                  {(err, eventList, set) => (
+                  {(err, eventList) => (
                     <div>
                       <span>Fan: </span>
                       <LastValue
@@ -30,16 +30,15 @@ function App() {
                         state={states.fireplace_fan}
                       ></LastValue>
                       <ToggleButton
-                        name="fireplace_fan"
+                        name="fireplace_fan_button"
                         event={eventList[0]}
-                        set={set}
                       ></ToggleButton>
                     </div>
                   )}
                 </Events>
 
                 <Events select="livingroom_light" last="1">
-                  {(err, eventList, set) => (
+                  {(err, eventList) => (
                     <div>
                       <span>Light: </span>
                       <LastValue
@@ -51,7 +50,7 @@ function App() {
                 </Events>
 
                 <Events select="fireplace_temp_bottom" last="100">
-                  {(err, eventList, set) => (
+                  {(err, eventList) => (
                     <div>
                       <span>Temp bottom: </span>
                       <LastValue
@@ -69,27 +68,25 @@ function App() {
                 <hr></hr>
                 <h4>Livingroom</h4>
                 <Events select="led1" last="1">
-                  {(err, eventList, set) => (
+                  {(err, eventList) => (
                     <ToggleButton
                       name="button_led1"
                       event={eventList[0]}
-                      set={set}
                     ></ToggleButton>
                   )}
                 </Events>
 
                 <Events select="led2" last="1">
-                  {(err, eventList, set) => (
+                  {(err, eventList) => (
                     <ToggleButton
                       name="button_led2"
                       event={eventList[0]}
-                      set={set}
                     ></ToggleButton>
                   )}
                 </Events>
 
                 <Events select="temperature2" last="100">
-                  {(err, eventList, set) => (
+                  {(err, eventList) => (
                     <div>
                       <span>Temp corner: </span>
                       <LastValue
@@ -105,7 +102,7 @@ function App() {
                 </Events>
 
                 <Events select="humidity1" last="100">
-                  {(err, eventList, set) => (
+                  {(err, eventList) => (
                     <div>
                       <span>Humidity corner: </span>
                       <LastValue
@@ -124,7 +121,7 @@ function App() {
                 <h4>Mockdevice</h4>
 
                 <Events select="light_top" last="1">
-                  {(err, eventList, set) => (
+                  {(err, eventList) => (
                     <div>
                       <LastValue
                         eventList={eventList}
@@ -133,7 +130,6 @@ function App() {
                       <ToggleButton
                         name="button_mock_state"
                         event={eventList[0]}
-                        set={set}
                       ></ToggleButton>
                     </div>
 
@@ -141,7 +137,7 @@ function App() {
                 </Events>
 
                 <Events select="temperature_mock" last="100">
-                  {(err, eventList, set) => (
+                  {(err, eventList) => (
                     <div>
                       <span>temperature_mock corner: </span>
                       <LastValue
@@ -156,7 +152,7 @@ function App() {
                   )}
                 </Events>
                 <Events select="possible_error_mock" last="100">
-                  {(err, eventList, set) => (
+                  {(err, eventList) => (
                     <div>
                       <span>possible_error_mock corner: </span>
                       <LastValue
