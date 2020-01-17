@@ -122,18 +122,16 @@ function App() {
                         eventList={eventDict.temperature_mock}
                         state={states.temperature_mock}
                       ></LastValue>
-                      <HistoryDisplay
-                        eventList={eventDict.temperature_mock}
-                        state={states.temperature_mock}
-                      ></HistoryDisplay>
+
                       <span>possible_error_mock corner: </span>
                       <LastValue
                         eventList={eventDict.possible_error_mock}
                         state={states.possible_error_mock}
                       ></LastValue>
+
                       <HistoryDisplay
-                        eventList={eventDict.possible_error_mock}
-                        state={states.possible_error_mock}
+                        eventDict={eventDict}
+                        state={states.temperature_mock}
                       ></HistoryDisplay>
                     </div>
                   )}

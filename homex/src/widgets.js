@@ -3,7 +3,6 @@ import { sendEvent } from "./provider.js";
 import { LineChart, Line, CartesianGrid, XAxis, YAxis } from "recharts";
 
 function LastValue(props) {
-  console.log(props);
 
   if (props.state && props.eventList && props.eventList.length > 0) {
     return (
@@ -16,23 +15,45 @@ function LastValue(props) {
   }
 }
 
+const getColor = function () {
+  const colors = ['#8884d8', '#c0c8ad', '#dbd8ae', '#ca907e', '#994636', '#895b1e'];
+  let idx = 0;
+
+  return () => {
+    idx = idx + 1;
+
+    if (idx >= colors.length) {
+      idx = 0;
+    }
+
+    return colors[idx];
+  }
+}()
+
+
 function HistoryDisplay(props) {
   if (!props.state) {
     return <div>state not existing</div>;
   }
-  if (!props.eventList) {
+  if (!props.eventDict) {
     return <div>no value yet</div>
   }
 
-  let data = props.eventList.map(item => {
-    item["parsed"] = Date.parse(item["inserted"]);
-    return item;
-  });
+  let data = Object.keys(props.eventDict).reduce((acc, key) => {
+    let keyList = props.eventDict[key];
+    keyList = keyList.map(event => {
+      event[key] = event.value;
+      event["parsed"] = Date.parse(event["inserted"])
+      return event;
+    });
+    return acc.concat(keyList);
+  }, []);
+
   return (
     <div>
       <LineChart
         width={730}
-        height={250}
+        height={350}
         data={data}
         margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
       >
@@ -44,7 +65,10 @@ function HistoryDisplay(props) {
           tickFormatter={dateToString}
         />
         <YAxis dataKey="value" unit={props.state.attribute.unit} />
-        <Line type="monotone" dataKey="value" stroke="#8884d8" />
+        {Object.keys(props.eventDict).map(key => {
+          return <Line key={key} type="monotone" dataKey={key} stroke={getColor()} />
+        })}
+
       </LineChart>
     </div>
   );
@@ -54,6 +78,8 @@ function dateToString(dt) {
   let d = new Date(dt);
   let s = d.toLocaleTimeString().split(":");
   return s[0] + ":" + s[1];
+
+  // TODO add days somehow.
 }
 
 class ToggleButton extends React.Component {
