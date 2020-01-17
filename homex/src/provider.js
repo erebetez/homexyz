@@ -131,41 +131,50 @@ class Events extends React.Component {
     super(props);
     this.state = {
       err: false,
-      eventList: [], // newest item in 0
+      eventDict: {}, // newest item in 0
       loading: false
     };
   }
 
   componentDidMount() {
-    this.fetchEvent();
+    this.setState({ loading: true });
+    console.log(this.props.select);
 
-    socket.send(
-      JSON.stringify({
-        key: "register",
-        value: {
-          id: device.id,
-          key: this.props.select
+    this.props.select.forEach(key => {
+      this.fetchEvent(key);
+
+      socket.send(
+        JSON.stringify({
+          key: "register",
+          value: {
+            id: device.id,
+            key: key
+          }
+        })
+      );
+
+      messageHandler.addListener(key, data => {
+        let keyDict = this.state.eventDict;
+        // TODO use data key instead?
+        let keyList = keyDict[key];
+        if (!keyList) {
+          keyList = [];
         }
+
+        if (keyList.length > this.props.last) {
+          keyList.pop();
+        }
+
+        keyList.unshift(data);
+        keyDict[key] = keyList;
+        this.setState({ eventDict: keyDict });
       })
-    );
-
-    messageHandler.addListener(this.props.select, data => {
-      let l = this.state.eventList;
-
-      if (l.length > this.props.last) {
-        l.pop();
-      }
-
-      l.unshift(data);
-      this.setState({ eventList: l });
     })
-
   }
 
-  async fetchEvent() {
-    this.setState({ loading: true });
+  async fetchEvent(key) {
 
-    let query = "/events/" + this.props.select;
+    let query = "/events/" + key;
     if (this.props.last) {
       query += "?last=" + this.props.last + "&type=count";
     }
@@ -174,16 +183,25 @@ class Events extends React.Component {
       if (err) {
         this.setState({ err });
       } else {
+        let keyDict = this.state.eventDict;
+        // NOTE overwrite existing events
+        keyDict[key] = newEvents;
+
         this.setState({
           loading: false,
-          eventList: newEvents
+          eventDict: keyDict
         });
       }
     })
   }
 
+  saveEvent(key) {
+    // FIXME refactoring...
+    console.log(key);
+  }
+
   render() {
-    return this.props.children(this.state.err, this.state.eventList);
+    return this.props.children(this.state.err, this.state.eventDict);
   }
 }
 

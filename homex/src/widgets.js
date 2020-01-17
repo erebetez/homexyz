@@ -5,7 +5,7 @@ import { LineChart, Line, CartesianGrid, XAxis, YAxis } from "recharts";
 function LastValue(props) {
   console.log(props);
 
-  if (props.state && props.eventList.length > 0) {
+  if (props.state && props.eventList && props.eventList.length > 0) {
     return (
       <h3 class="badge badge-secondary">
         {props.eventList[0].value} {props.state.attribute.unit}
@@ -17,9 +17,13 @@ function LastValue(props) {
 }
 
 function HistoryDisplay(props) {
-  if (props.state === undefined) {
+  if (!props.state) {
     return <div>state not existing</div>;
   }
+  if (!props.eventList) {
+    return <div>no value yet</div>
+  }
+
   let data = props.eventList.map(item => {
     item["parsed"] = Date.parse(item["inserted"]);
     return item;
@@ -54,7 +58,7 @@ function dateToString(dt) {
 
 class ToggleButton extends React.Component {
   click(ev) {
-    let val = this.props.event.value;
+    let val = this.props.eventList[0].value;
     if (val === 0) {
       val = 1;
     } else {
@@ -65,11 +69,11 @@ class ToggleButton extends React.Component {
   }
 
   render() {
-    if (this.props.event) {
+    if (this.props.eventList && this.props.eventList.length > 0) {
       return (
         <div>
           <button class="btn btn-secondary" onClick={this.click.bind(this)}>
-            Toggle
+            Toggle: {this.props.eventList[0].value}
           </button>
         </div>
       );

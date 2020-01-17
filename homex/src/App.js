@@ -21,45 +21,58 @@ function App() {
                 <Devices devices={devices} states={states}></Devices>
                 <hr></hr>
                 <h4>Fireplace</h4>
-                <Events select="fireplace_fan" last="1">
-                  {(err, eventList) => (
+                <Events select={["fireplace_fan", "livingroom_light"]} last="1">
+                  {(err, eventDict) => (
                     <div>
                       <span>Fan: </span>
                       <LastValue
-                        eventList={eventList}
+                        eventList={eventDict.fireplace_fan}
                         state={states.fireplace_fan}
                       ></LastValue>
                       <ToggleButton
                         name="fireplace_fan_button"
-                        event={eventList[0]}
+                        eventList={eventDict.fireplace_fan}
                       ></ToggleButton>
-                    </div>
-                  )}
-                </Events>
-
-                <Events select="livingroom_light" last="1">
-                  {(err, eventList) => (
-                    <div>
                       <span>Light: </span>
                       <LastValue
-                        eventList={eventList}
+                        eventList={eventDict.livingroom_light}
                         state={states.livingroom_light}
                       ></LastValue>
                     </div>
                   )}
                 </Events>
 
-                <Events select="fireplace_temp_bottom" last="100">
-                  {(err, eventList) => (
+                <Events select={["fireplace_temp_bottom", "temperature2", "humidity1"]} last="100">
+                  {(err, eventDict) => (
                     <div>
                       <span>Temp bottom: </span>
                       <LastValue
-                        eventList={eventList}
+                        eventList={eventDict.fireplace_temp_bottom}
                         state={states.fireplace_temp_bottom}
                       ></LastValue>
                       <HistoryDisplay
-                        eventList={eventList}
+                        eventList={eventDict.fireplace_temp_bottom}
                         state={states.fireplace_temp_bottom}
+                      ></HistoryDisplay>
+
+                      <span>Temp corner: </span>
+                      <LastValue
+                        eventList={eventDict.temperature2}
+                        state={states.temperature2}
+                      ></LastValue>
+                      <HistoryDisplay
+                        eventList={eventDict.temperature2}
+                        state={states.temperature2}
+                      ></HistoryDisplay>
+
+                      <span>Humidity corner: </span>
+                      <LastValue
+                        eventList={eventDict.humidity1}
+                        state={states.humidity1}
+                      ></LastValue>
+                      <HistoryDisplay
+                        eventList={eventDict.humidity1}
+                        state={states.humidity1}
                       ></HistoryDisplay>
                     </div>
                   )}
@@ -67,52 +80,17 @@ function App() {
 
                 <hr></hr>
                 <h4>Livingroom</h4>
-                <Events select="led1" last="1">
-                  {(err, eventList) => (
-                    <ToggleButton
-                      name="button_led1"
-                      event={eventList[0]}
-                    ></ToggleButton>
-                  )}
-                </Events>
-
-                <Events select="led2" last="1">
-                  {(err, eventList) => (
-                    <ToggleButton
-                      name="button_led2"
-                      event={eventList[0]}
-                    ></ToggleButton>
-                  )}
-                </Events>
-
-                <Events select="temperature2" last="100">
-                  {(err, eventList) => (
+                <Events select={["led1", "led2"]} last="1">
+                  {(err, eventDict) => (
                     <div>
-                      <span>Temp corner: </span>
-                      <LastValue
-                        eventList={eventList}
-                        state={states.temperature2}
-                      ></LastValue>
-                      <HistoryDisplay
-                        eventList={eventList}
-                        state={states.temperature2}
-                      ></HistoryDisplay>
-                    </div>
-                  )}
-                </Events>
-
-                <Events select="humidity1" last="100">
-                  {(err, eventList) => (
-                    <div>
-                      <span>Humidity corner: </span>
-                      <LastValue
-                        eventList={eventList}
-                        state={states.humidity1}
-                      ></LastValue>
-                      <HistoryDisplay
-                        eventList={eventList}
-                        state={states.humidity1}
-                      ></HistoryDisplay>
+                      <ToggleButton
+                        name="button_led1"
+                        eventList={eventDict.led1}
+                      ></ToggleButton>
+                      <ToggleButton
+                        name="button_led2"
+                        eventList={eventDict.led2}
+                      ></ToggleButton>
                     </div>
                   )}
                 </Events>
@@ -120,47 +98,41 @@ function App() {
                 <hr></hr>
                 <h4>Mockdevice</h4>
 
-                <Events select="light_top" last="1">
-                  {(err, eventList) => (
+                <Events select={["light_top"]} last="1">
+                  {(err, eventDict) => (
                     <div>
                       <LastValue
-                        eventList={eventList}
+                        eventList={eventDict.light_top}
                         state={states.light_top}
                       ></LastValue>
                       <ToggleButton
                         name="button_mock_state"
-                        event={eventList[0]}
+                        eventList={eventDict.light_top}
                       ></ToggleButton>
                     </div>
 
                   )}
                 </Events>
 
-                <Events select="temperature_mock" last="100">
-                  {(err, eventList) => (
+                <Events select={["temperature_mock", "possible_error_mock"]} last="100">
+                  {(err, eventDict) => (
                     <div>
                       <span>temperature_mock corner: </span>
                       <LastValue
-                        eventList={eventList}
+                        eventList={eventDict.temperature_mock}
                         state={states.temperature_mock}
                       ></LastValue>
                       <HistoryDisplay
-                        eventList={eventList}
+                        eventList={eventDict.temperature_mock}
                         state={states.temperature_mock}
                       ></HistoryDisplay>
-                    </div>
-                  )}
-                </Events>
-                <Events select="possible_error_mock" last="100">
-                  {(err, eventList) => (
-                    <div>
                       <span>possible_error_mock corner: </span>
                       <LastValue
-                        eventList={eventList}
+                        eventList={eventDict.possible_error_mock}
                         state={states.possible_error_mock}
                       ></LastValue>
                       <HistoryDisplay
-                        eventList={eventList}
+                        eventList={eventDict.possible_error_mock}
                         state={states.possible_error_mock}
                       ></HistoryDisplay>
                     </div>
