@@ -125,11 +125,18 @@ function App() {
 
                 <Events select="light_top" last="1">
                   {(err, eventList, set) => (
-                    <ToggleButton
-                      name="button_mock_state"
-                      event={eventList[0]}
-                      set={set}
-                    ></ToggleButton>
+                    <div>
+                      <LastValue
+                        eventList={eventList}
+                        state={states.light_top}
+                      ></LastValue>
+                      <ToggleButton
+                        name="button_mock_state"
+                        event={eventList[0]}
+                        set={set}
+                      ></ToggleButton>
+                    </div>
+
                   )}
                 </Events>
 
