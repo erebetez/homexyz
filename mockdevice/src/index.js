@@ -3,7 +3,8 @@ const WebSocket = require('ws');
 
 const magic = "magic";
 
-
+const host = process.env.host || "localhost";
+const port = process.env.port || "3667";
 
 const device = {
     id: "m1",
@@ -18,9 +19,10 @@ const device = {
 let someState = 0;
 
 const connection = function () {
-    const ws = new WebSocket('ws://localhost:3667');
+    const ws = new WebSocket("ws://" + host + ":" + port);
 
     ws.on('open', () => {
+        console.log("Connected to " + host + ":" + port);
         ws.send(JSON.stringify({
             key: 'device',
             value: device

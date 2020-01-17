@@ -11,6 +11,9 @@ const device = {
   }
 };
 
+const host = process.env.host || "localhost";
+const port = process.env.port || "3667";
+
 const startTemp = 60;
 const minTemp = 50;
 
@@ -19,9 +22,10 @@ let light = 0;
 let fan = 0;
 
 const connection = function () {
-  const ws = new WebSocket("ws://homey:3667");
+  const ws = new WebSocket("ws://" + host + ":" + port);
 
   ws.on("open", () => {
+    console.log("Connected to " + host + ":" + port);
     ws.send(
       JSON.stringify({
         key: "device",
