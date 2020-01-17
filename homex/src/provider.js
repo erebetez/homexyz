@@ -28,15 +28,34 @@ socket.addEventListener("open", function (event) {
   );
 });
 
-function listenerHandler(key, cb) {
-  return event => {
-    console.log(event);
-    let data = JSON.parse(event.data);
-    if (data.key === key) {
-      cb(data);
+const messageHandler = function () {
+  let observers = {};
+
+  socket.addEventListener(
+    "message",
+    event => {
+      console.log(event);
+      let data = JSON.parse(event.data);
+      let observer = observers[data.key];
+      if (observer) {
+        observer.forEach(handler => {
+          handler(data);
+        });
+      }
+    });
+
+  return {
+    addListener: (key, func) => {
+      let keyList = observers[key];
+      if (keyList) {
+        keyList.push(func);
+      } else {
+        keyList = [func];
+      }
+      observers[key] = keyList;
     }
-  };
-}
+  }
+}()
 
 class ServiceData extends React.Component {
   constructor(props) {
@@ -54,16 +73,13 @@ class ServiceData extends React.Component {
     this.fetchDevices();
     this.fetchStates();
 
-    socket.addEventListener(
-      "message",
-      listenerHandler("devices", data => {
-        // getting only the updated device
-        let newState = this.state.devices;
-        let device = data.value;
-        newState[device.id] = device;
-        this.setState({ devices: newState });
-      })
-    );
+    messageHandler.addListener("devices", data => {
+      // getting only the updated device
+      let newState = this.state.devices;
+      let device = data.value;
+      newState[device.id] = device;
+      this.setState({ devices: newState });
+    })
   }
 
   async fetchDevices() {
@@ -133,19 +149,17 @@ class Events extends React.Component {
       })
     );
 
-    socket.addEventListener(
-      "message",
-      listenerHandler(this.props.select, data => {
-        let l = this.state.eventList;
+    messageHandler.addListener(this.props.select, data => {
+      let l = this.state.eventList;
 
-        if (l.length > this.props.last) {
-          l.pop();
-        }
+      if (l.length > this.props.last) {
+        l.pop();
+      }
 
-        l.unshift(data);
-        this.setState({ eventList: l });
-      })
-    );
+      l.unshift(data);
+      this.setState({ eventList: l });
+    })
+
   }
 
   async fetchEvent() {
@@ -169,7 +183,6 @@ class Events extends React.Component {
   }
 
   async setEvent(origin, value) {
-    //this.setState({ loading: true });
     socket.send(
       JSON.stringify({
         key: this.props.select,
