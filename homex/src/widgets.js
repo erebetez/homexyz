@@ -47,7 +47,6 @@ function HistoryDisplay(props) {
   let data = Object.keys(props.eventDict).reduce((acc, key) => {
 
     if (firstKey === undefined) {
-      console.log(key);
       firstKey = key;
     }
 
@@ -79,7 +78,15 @@ function HistoryDisplay(props) {
         <Legend verticalAlign="top" height={36} />
         <Tooltip />
         {Object.keys(props.eventDict).map(key => {
-          return <Line key={key} type="monotone" dataKey={key} stroke={color()} />
+          let type;
+          switch (props.states[firstKey].attribute.type) {
+            case 'switch':
+              type = "stepBefore";
+              break;
+            default:
+              type = "monotone"
+          }
+          return <Line key={key} type={type} dataKey={key} stroke={color()} />
         })}
 
       </LineChart>
@@ -97,14 +104,16 @@ function dateToString(dt) {
 
 class ToggleButton extends React.Component {
   click(ev) {
-    let val = this.props.eventList[0].value;
-    if (val === 0) {
-      val = 1;
-    } else {
-      val = 0;
-    }
+    if (this.props.eventList && this.props.eventList.length > 0) {
+      let val = this.props.eventList[0].value;
+      if (val === 0) {
+        val = 1;
+      } else {
+        val = 0;
+      }
 
-    sendEvent(this.props.event.key, val, this.props.name);
+      sendEvent(this.props.eventList[0].key, val, this.props.name);
+    }
   }
 
   render() {

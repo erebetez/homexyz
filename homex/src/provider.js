@@ -34,7 +34,7 @@ const messageHandler = function () {
   socket.addEventListener(
     "message",
     event => {
-      console.log(event);
+      // console.log(event);
       let data = JSON.parse(event.data);
       let observer = observers[data.key];
       if (observer) {
@@ -138,7 +138,7 @@ class Events extends React.Component {
 
   componentDidMount() {
     this.setState({ loading: true });
-    console.log(this.props.select);
+    //console.log(this.props.select);
 
     this.props.select.forEach(key => {
       this.fetchEvent(key);
@@ -175,8 +175,14 @@ class Events extends React.Component {
   async fetchEvent(key) {
 
     let query = "/events/" + key;
+    let last = this.props.last || "10";
+    let type = this.props.type || "count";
+
+    console.log("last: " + last);
+    console.log("type: " + type);
+
     if (this.props.last) {
-      query += "?last=" + this.props.last + "&type=count";
+      query += "?last=" + last + "&type=" + type;
     }
 
     fetchService(query, (err, newEvents) => {

@@ -50,29 +50,22 @@ function App() {
                         eventList={eventDict.fireplace_temp_bottom}
                         state={states.fireplace_temp_bottom}
                       ></LastValue>
-                      <HistoryDisplay
-                        eventList={eventDict.fireplace_temp_bottom}
-                        state={states.fireplace_temp_bottom}
-                      ></HistoryDisplay>
 
                       <span>Temp corner: </span>
                       <LastValue
                         eventList={eventDict.temperature2}
                         state={states.temperature2}
                       ></LastValue>
-                      <HistoryDisplay
-                        eventList={eventDict.temperature2}
-                        state={states.temperature2}
-                      ></HistoryDisplay>
 
                       <span>Humidity corner: </span>
                       <LastValue
                         eventList={eventDict.humidity1}
                         state={states.humidity1}
                       ></LastValue>
+
                       <HistoryDisplay
-                        eventList={eventDict.humidity1}
-                        state={states.humidity1}
+                        eventDict={eventDict}
+                        states={states}
                       ></HistoryDisplay>
                     </div>
                   )}
@@ -98,7 +91,7 @@ function App() {
                 <hr></hr>
                 <h4>Mockdevice</h4>
 
-                <Events select={["light_top"]} last="1">
+                <Events select={["light_top"]} last="5">
                   {(err, eventDict) => (
                     <div>
                       <LastValue
@@ -109,12 +102,15 @@ function App() {
                         name="button_mock_state"
                         eventList={eventDict.light_top}
                       ></ToggleButton>
+                      <HistoryDisplay
+                        eventDict={eventDict}
+                        states={states}
+                      ></HistoryDisplay>
                     </div>
-
                   )}
                 </Events>
 
-                <Events select={["temperature_mock", "possible_error_mock"]} last="100">
+                <Events select={["temperature_mock", "possible_error_mock"]} last="0.5" type="days">
                   {(err, eventDict) => (
                     <div>
                       <span>temperature_mock corner: </span>
