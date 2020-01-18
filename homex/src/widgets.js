@@ -32,7 +32,7 @@ const getColor = function () {
 
 
 function HistoryDisplay(props) {
-  if (!props.states) {
+  if (!props.states || Object.keys(props.states).length === 0) {
     return <div>state not existing</div>;
   }
   if (!props.eventDict || Object.keys(props.eventDict).length === 0) {
@@ -41,14 +41,7 @@ function HistoryDisplay(props) {
 
   const color = getColor();
 
-  // catch first key for states unit etc. 
-  let firstKey = undefined;
-
   let data = Object.keys(props.eventDict).reduce((acc, key) => {
-
-    if (firstKey === undefined) {
-      firstKey = key;
-    }
 
     let keyList = props.eventDict[key];
     keyList = keyList.map(event => {
@@ -68,25 +61,52 @@ function HistoryDisplay(props) {
         margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
       >
         <CartesianGrid strokeDasharray="3 3" />
+        <Legend verticalAlign="top" height={36} />
+        <Tooltip />
+
         <XAxis
           dataKey="parsed"
           scale="time"
           reversed="true"
           tickFormatter={dateToString}
         />
-        <YAxis dataKey="value" unit={props.states[firstKey].attribute.unit} />
-        <Legend verticalAlign="top" height={36} />
-        <Tooltip />
+
         {Object.keys(props.eventDict).map(key => {
-          let type;
-          switch (props.states[firstKey].attribute.type) {
-            case 'switch':
-              type = "stepBefore";
-              break;
-            default:
-              type = "monotone"
+          // TODO group/reduce by unit.... 
+          if (props.states[key]) {
+            let hide;
+            switch (props.states[key].attribute.type) {
+              case 'switch':
+                hide = true;
+                break;
+
+              default:
+                hide = false
+                break;
+            }
+            return <YAxis key={key} yAxisId={key} hide={hide} dataKey={key} unit={props.states[key].attribute.unit} />
+          } else {
+            return <YAxis key={key} yAxisId={key} dataKey={key} />
           }
-          return <Line key={key} dot={false} type={type} dataKey={key} stroke={color()} />
+        })}
+
+        {Object.keys(props.eventDict).map(key => {
+          if (props.states[key]) {
+            let type;
+            switch (props.states[key].attribute.type) {
+              case 'switch':
+                type = "stepBefore";
+                break;
+
+              default:
+                type = "monotone"
+                break;
+            }
+            return <Line key={key} yAxisId={key} dot={false} type={type} dataKey={key} stroke={color()} />
+          } else {
+            return <Line key={key} yAxisId={key} dot={false} type="monotone" dataKey={key} stroke={color()} />
+          }
+
         })}
 
       </LineChart>
