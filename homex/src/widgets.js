@@ -86,7 +86,7 @@ function HistoryDisplay(props) {
             }
             return <YAxis key={key} yAxisId={key} hide={hide} dataKey={key} unit={props.states[key].attribute.unit} />
           } else {
-            return <YAxis key={key} yAxisId={key} dataKey={key} />
+            return <div></div>
           }
         })}
 
