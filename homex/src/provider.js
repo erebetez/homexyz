@@ -178,9 +178,6 @@ class Events extends React.Component {
     let last = this.props.last || "10";
     let type = this.props.type || "count";
 
-    console.log("last: " + last);
-    console.log("type: " + type);
-
     if (this.props.last) {
       query += "?last=" + last + "&type=" + type;
     }

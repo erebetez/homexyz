@@ -86,7 +86,7 @@ function HistoryDisplay(props) {
             default:
               type = "monotone"
           }
-          return <Line key={key} type={type} dataKey={key} stroke={color()} />
+          return <Line key={key} dot={false} type={type} dataKey={key} stroke={color()} />
         })}
 
       </LineChart>
