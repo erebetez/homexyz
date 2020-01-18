@@ -135,23 +135,34 @@ async function getLogs(cb) {
 
 
 async function getEvents(key, query, cb) {
-    let text = "SELECT key, inserted, value FROM events WHERE key = $1 ORDER BY inserted desc";
+    let select = "SELECT key, inserted, value FROM events WHERE key = $1";
+    let where = "";
+    let order = "ORDER BY inserted desc";
+    let limit = "";
     let params = [key];
 
     switch (query.type) {
         case "count":
-            text += " LIMIT $2";
+            limit = "LIMIT $2";
             params.push(query.last);
 
             break;
-        case "days": /// FIXME probably better to use time or inserted as key word...
-            // TODO
+        case "days":
+            let now = Date.now();
+            let since = new Date(now - (query.last * 1000 * 60 * 60 * 24)) // days
 
+            where = "AND inserted > $2"
+            params.push(since.toISOString());
+
+            break;
+        default:
+            limit = "LIMIT $2";
+            params.push(100);
             break;
     }
 
     try {
-        let retr = await db().query(text, params);
+        let retr = await db().query([select, where, order, limit].join(" "), params);
         cb(false, retr);
     } catch (e) {
         cb(e, false)
