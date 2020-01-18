@@ -131,7 +131,7 @@ function App() {
 
                       <HistoryDisplay
                         eventDict={eventDict}
-                        state={states.temperature_mock}
+                        states={states}
                       ></HistoryDisplay>
                     </div>
                   )}

@@ -1,6 +1,6 @@
 import React from "react";
 import { sendEvent } from "./provider.js";
-import { LineChart, Line, CartesianGrid, XAxis, YAxis } from "recharts";
+import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, Legend } from "recharts";
 
 function LastValue(props) {
 
@@ -16,7 +16,7 @@ function LastValue(props) {
 }
 
 const getColor = function () {
-  const colors = ['#8884d8', '#c0c8ad', '#dbd8ae', '#ca907e', '#994636', '#895b1e'];
+  const colors = ['#191102', '#994636', '#f3b61f', '#a29f15', '#510d0a', '#895b1e'];
   let idx = 0;
 
   return () => {
@@ -28,18 +28,29 @@ const getColor = function () {
 
     return colors[idx];
   }
-}()
+}
 
 
 function HistoryDisplay(props) {
-  if (!props.state) {
+  if (!props.states) {
     return <div>state not existing</div>;
   }
-  if (!props.eventDict) {
+  if (!props.eventDict || Object.keys(props.eventDict).length === 0) {
     return <div>no value yet</div>
   }
 
+  const color = getColor();
+
+  // catch first key for states unit etc. 
+  let firstKey = undefined;
+
   let data = Object.keys(props.eventDict).reduce((acc, key) => {
+
+    if (firstKey === undefined) {
+      console.log(key);
+      firstKey = key;
+    }
+
     let keyList = props.eventDict[key];
     keyList = keyList.map(event => {
       event[key] = event.value;
@@ -64,9 +75,11 @@ function HistoryDisplay(props) {
           reversed="true"
           tickFormatter={dateToString}
         />
-        <YAxis dataKey="value" unit={props.state.attribute.unit} />
+        <YAxis dataKey="value" unit={props.states[firstKey].attribute.unit} />
+        <Legend verticalAlign="top" height={36} />
+        <Tooltip />
         {Object.keys(props.eventDict).map(key => {
-          return <Line key={key} type="monotone" dataKey={key} stroke={getColor()} />
+          return <Line key={key} type="monotone" dataKey={key} stroke={color()} />
         })}
 
       </LineChart>
