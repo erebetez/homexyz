@@ -64,24 +64,25 @@ const connection = function () {
     if (data.key === "fireplace_temp_bottom") {
       temp = data.value;
       let decision = logic();
-      sendRequest(decision, data.transaction_id);
+      sendRequest(decision, data);
     }
     if (data.key === "livingroom_light") {
       light = data.value;
       let decision = logic();
-      sendRequest(decision, data.transaction_id);
+      sendRequest(decision, data);
     }
     if (data.key === "fireplace_fan") {
       fan = data.value;
     }
   });
 
-  function sendRequest(decision, transaction_id) {
+  function sendRequest(decision, data) {
     if (decision) {
       ws.send(
         JSON.stringify({
           key: "fireplace_fan",
-          transaction_id: transaction_id,
+          origin: data.key,
+          transaction_id: data.transaction_id,
           value: decision
         })
       );
