@@ -3,7 +3,6 @@ import { sendEvent } from "./provider.js";
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, Legend } from "recharts";
 
 function LastValue(props) {
-
   if (props.state && props.eventList && props.eventList.length > 0) {
     return (
       <h3 class="badge badge-secondary">
@@ -86,7 +85,7 @@ function HistoryDisplay(props) {
             }
             return <YAxis key={key} yAxisId={key} hide={hide} dataKey={key} unit={props.states[key].attribute.unit} />
           } else {
-            return <div></div>
+            return <div key="dummy"></div>
           }
         })}
 

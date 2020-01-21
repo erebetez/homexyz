@@ -77,10 +77,12 @@ function App() {
                   {(err, eventDict) => (
                     <div>
                       <ToggleButton
+                        key="button_led1"
                         name="button_led1"
                         eventList={eventDict.led1}
                       ></ToggleButton>
                       <ToggleButton
+                        key="button_led2"
                         name="button_led2"
                         eventList={eventDict.led2}
                       ></ToggleButton>
@@ -90,38 +92,54 @@ function App() {
 
                 <hr></hr>
                 <h4>Mockdevice</h4>
-
-                <Events select={["temperature_mock", "possible_error_mock", "light_top"]} last="0.1" type="days">
+                <Events select={["light_top"]} last="1" type="count">
                   {(err, eventDict) => (
                     <div>
                       <LastValue
                         eventList={eventDict.light_top}
                         state={states.light_top}
                       ></LastValue>
+
                       <ToggleButton
                         name="button_mock_state"
                         eventList={eventDict.light_top}
                       ></ToggleButton>
-
-                      <span>temperature_mock: </span>
-                      <LastValue
-                        eventList={eventDict.temperature_mock}
-                        state={states.temperature_mock}
-                      ></LastValue>
-
-                      <span>possible_error_mock: </span>
-                      <LastValue
-                        eventList={eventDict.possible_error_mock}
-                        state={states.possible_error_mock}
-                      ></LastValue>
-
-                      <HistoryDisplay
-                        eventDict={eventDict}
-                        states={states}
-                      ></HistoryDisplay>
                     </div>
                   )}
                 </Events>
+
+                <hr></hr>
+
+                <RangeChooser>
+                  {(range) => (
+                    <Events key={"mock-graph-" + range} select={["temperature_mock", "possible_error_mock", "light_top"]} last={range} type="days">
+                      {(err, eventDict) => (
+                        <div>
+                          <div>
+                            <span>temperature_mock: </span>
+                            <LastValue
+                              eventList={eventDict.temperature_mock}
+                              state={states.temperature_mock}
+                            ></LastValue>
+                          </div>
+
+                          <div>
+                            <span>possible_error_mock: </span>
+                            <LastValue
+                              eventList={eventDict.possible_error_mock}
+                              state={states.possible_error_mock}
+                            ></LastValue>
+                          </div>
+
+                          <HistoryDisplay
+                            eventDict={eventDict}
+                            states={states}
+                          ></HistoryDisplay>
+                        </div>
+                      )}
+                    </Events>
+                  )}
+                </RangeChooser>
               </div>
             );
           }
@@ -129,6 +147,42 @@ function App() {
       </ServiceData>
     </div>
   );
+}
+
+
+class RangeChooser extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      auto: true,
+      range: "0.1"
+      // unit = days
+    };
+  }
+
+  click(ev) {
+    console.log(ev);
+  }
+  change(ev) {
+    console.log(ev);
+    this.setState({ range: ev.value });
+  }
+
+  render() {
+    return (<div>
+      <button class="btn btn-secondary" onClick={this.click.bind(this)}>
+        Back
+      </button>
+      <input class="form-control" type="number" onChange={this.change.bind(this)} value={this.state.range} />
+      <button class="btn btn-secondary" onClick={this.click.bind(this)}>
+        Auto refresh
+      </button>
+      <button class="btn btn-secondary" onClick={this.click.bind(this)}>
+        forward
+      </button>
+      {this.props.children(this.state.range)}
+    </div>)
+  }
 }
 
 export default App;

@@ -173,7 +173,6 @@ class Events extends React.Component {
   }
 
   async fetchEvent(key) {
-
     let query = "/events/" + key;
     let last = this.props.last || "10";
     let type = this.props.type || "count";
@@ -196,11 +195,6 @@ class Events extends React.Component {
         });
       }
     })
-  }
-
-  saveEvent(key) {
-    // FIXME refactoring...
-    console.log(key);
   }
 
   render() {
