@@ -170,16 +170,18 @@ class RangeChooser extends React.Component {
 
   render() {
     return (<div>
-      <button class="btn btn-secondary" onClick={this.click.bind(this)}>
-        Back
+      <div class="form-group row">
+        <button class="btn btn-primary col-sm-2" onClick={this.click.bind(this)}>
+          Back
       </button>
-      <input class="form-control" type="number" onChange={this.change.bind(this)} value={this.state.range} />
-      <button class="btn btn-secondary" onClick={this.click.bind(this)}>
-        Auto refresh
+        <input class="form-control col-sm-2" type="number" onChange={this.change.bind(this)} value={this.state.range} />
+        <button class="btn btn-secondary col-sm-2" onClick={this.click.bind(this)}>
+          Auto refresh
       </button>
-      <button class="btn btn-secondary" onClick={this.click.bind(this)}>
-        forward
+        <button class="btn btn-primary col-sm-2" onClick={this.click.bind(this)}>
+          forward
       </button>
+      </div>
       {this.props.children(this.state.range)}
     </div>)
   }
