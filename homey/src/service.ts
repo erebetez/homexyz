@@ -141,21 +141,31 @@ async function getEvents(key, query, cb) {
     let limit = "";
     let params = [key];
 
+    // TODO implement 'from'  'to'
+
+    let factor = 6000; // minutes
+
     switch (query.type) {
         case "count":
             limit = "LIMIT $2";
             params.push(query.last);
-
             break;
+
         case "days":
+            factor = factor * 24;
+
+        case "houres":
+            factor = factor * 60;
+
+        case "minutes":
             let now = Date.now();
-            let since = new Date(now - (query.last * 1000 * 60 * 60 * 24)) // days
+            let since = new Date(now - (query.last * factor))
 
             where = "AND inserted > $2"
             params.push(since.toISOString());
-
             break;
         default:
+            // cb(e, false)
             limit = "LIMIT $2";
             params.push(100);
             break;
@@ -165,7 +175,7 @@ async function getEvents(key, query, cb) {
         let retr = await db().query([select, where, order, limit].join(" "), params);
         cb(false, retr);
     } catch (e) {
-        cb(e, false)
+        cb(e, false);
     }
 }
 
