@@ -161,7 +161,7 @@ class Events extends React.Component {
           keyList = [];
         }
 
-        if (keyList.length > this.props.last) {
+        if (keyList.length > (this.props.limit || 1)) {
           keyList.pop();
         }
 
@@ -174,18 +174,25 @@ class Events extends React.Component {
 
   async fetchEvent(key) {
     let query = "/events/" + key;
-    let last = this.props.last || "10";
-    let type = this.props.type || "count";
 
-    if (this.props.last) {
-      query += "?last=" + last + "&type=" + type;
-    }
+    let now = Date.now();
+
+    let limit = this.props.limit || "1";
+    let from = this.props.from || new Date(now - 86400000).toISOString(); // default one day
+    let to = this.props.to || new Date(now).toISOString();
+
+    query += "?limit=" + limit + "&from=" + from + "&to=" + to;
+
+    console.log(query);
 
     fetchService(query, (err, newEvents) => {
       if (err) {
         this.setState({ err });
       } else {
         let keyDict = this.state.eventDict;
+
+        console.log(newEvents);
+
         // NOTE overwrite existing events
         keyDict[key] = newEvents;
 

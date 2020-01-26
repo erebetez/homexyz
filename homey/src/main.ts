@@ -174,8 +174,7 @@ const connectionHandler = function () {
 
                         // send current value back
                         getEvents(request.key, {
-                            type: 'count',
-                            last: 1
+                            limit: 1
                         }, (err, retr) => {
                             if (err) {
                                 dbError(err);
@@ -194,19 +193,19 @@ const connectionHandler = function () {
                 }
             });
 
-            setInterval(() => {
-                ws.ping(() => {
-                    let gotIt = false;
-                    setTimeout(() => {
-                        if (!gotIt) {
-                            ws.close();
-                        }
-                    }, 5000);
-                    ws.on('pong', () => {
-                        gotIt = true;
-                    });
-                });
-            }, devicePingInterval)
+            // setInterval(() => {
+            //     ws.ping(() => {
+            //         let gotIt = false;
+            //         setTimeout(() => {
+            //             if (!gotIt) {
+            //                 ws.close();
+            //             }
+            //         }, 5000);
+            //         ws.on('pong', () => {
+            //             gotIt = true;
+            //         });
+            //     });
+            // }, devicePingInterval)
         },
         broadcast: broadcast,
         braodcastButSender: braodcastButSender,

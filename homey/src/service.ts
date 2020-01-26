@@ -141,38 +141,36 @@ async function getEvents(key, query, cb) {
     let limit = "";
     let params = [key];
 
-    // TODO implement 'from'  'to'
-
-    let factor = 6000; // minutes
-
-    switch (query.type) {
-        case "count":
-            limit = "LIMIT $2";
-            params.push(query.last);
-            break;
-
-        case "days":
-            factor = factor * 24;
-
-        case "houres":
-            factor = factor * 60;
-
-        case "minutes":
-            let now = Date.now();
-            let since = new Date(now - (query.last * factor))
-
-            where = "AND inserted > $2"
-            params.push(since.toISOString());
-            break;
-        default:
-            // cb(e, false)
-            limit = "LIMIT $2";
-            params.push(100);
-            break;
+    if (!query.form && !query.limit) {
+        cb(Error("Missing 'from' or 'limit' from query: " + JSON.stringify(query)), undefined);
+        return
     }
 
+    if (!query.to) {
+        let now = Date.now();
+        query.to = new Date(now).toISOString();
+    }
+
+    where += "AND inserted <= $2 "
+    params.push(query.to);
+
+    if (query.from) {
+        // TODO check for ISOString
+        where += "AND inserted > $3 "
+        params.push(query.from);
+    } else {
+        limit += "LIMIT $3";
+        params.push(query.limit);
+    }
+
+    console.log("params: " + JSON.stringify(params));
+
+    let sql = [select, where, order, limit].join(" ");
+
+    console.log(sql);
+
     try {
-        let retr = await db().query([select, where, order, limit].join(" "), params);
+        let retr = await db().query(sql, params);
         cb(false, retr);
     } catch (e) {
         cb(e, false);

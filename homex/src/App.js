@@ -92,7 +92,7 @@ function App() {
 
                 <hr></hr>
                 <h4>Mockdevice</h4>
-                <Events select={["light_top"]} last="1" type="count">
+                <Events select={["light_top"]} type="count">
                   {(err, eventDict) => (
                     <div>
                       <LastValue
@@ -111,8 +111,8 @@ function App() {
                 <hr></hr>
 
                 <RangeChooser>
-                  {(range) => (
-                    <Events key={"mock-graph-" + range} select={["temperature_mock", "possible_error_mock", "light_top"]} last={range} type="days">
+                  {(from, to) => (
+                    <Events key="mock-graph" select={["temperature_mock", "possible_error_mock", "light_top"]} from={from} to={to} type="days">
                       {(err, eventDict) => (
                         <div>
                           <div>
@@ -182,7 +182,7 @@ class RangeChooser extends React.Component {
           forward
       </button>
       </div>
-      {this.props.children(this.state.range)}
+      {this.props.children(this.state.from, this.state.to)}
     </div>)
   }
 }
