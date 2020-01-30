@@ -155,12 +155,20 @@ class RangeChooser extends React.Component {
     super(props);
     this.state = {
       auto: true,
-      range: "0.1"
+      range: 1,
+      from: undefined,
+      to: Date.now()
       // unit = days
     };
   }
 
-  click(ev) {
+  clickBack(ev) {
+    console.log(ev);
+  }
+  clickNext(ev) {
+    console.log(ev);
+  }
+  clickNewest(ev) {
     console.log(ev);
   }
   change(ev) {
@@ -168,22 +176,31 @@ class RangeChooser extends React.Component {
     this.setState({ range: ev.value });
   }
 
+  componentDidMount() {
+    this.state.from = this.state.to - (this.state.range * 1000 * 60 * 60)
+  }
+
   render() {
-    return (<div>
-      <div class="form-group row">
-        <button class="btn btn-primary col-sm-2" onClick={this.click.bind(this)}>
-          Back
-      </button>
-        <input class="form-control col-sm-2" type="number" onChange={this.change.bind(this)} value={this.state.range} />
-        <button class="btn btn-secondary col-sm-2" onClick={this.click.bind(this)}>
-          Auto refresh
-      </button>
-        <button class="btn btn-primary col-sm-2" onClick={this.click.bind(this)}>
-          forward
-      </button>
-      </div>
-      {this.props.children(this.state.from, this.state.to)}
-    </div>)
+    if (this.state.from && this.state.to) {
+      return (<div>
+        <div class="form-group row">
+          <button class="btn btn-primary col-sm-2" onClick={this.clickBack.bind(this)}>
+            Back
+        </button>
+          <input class="form-control col-sm-2" type="number" onChange={this.change.bind(this)} value={this.state.range} />
+          <button class="btn btn-secondary col-sm-2" onClick={this.clickNewest.bind(this)}>
+            To newest
+        </button>
+          <button class="btn btn-primary col-sm-2" onClick={this.clickNext.bind(this)}>
+            forward
+        </button>
+        </div>
+        {this.props.children(new Date(this.state.from).toISOString(), new Date(this.state.to).toISOString())}
+      </div>)
+    } else {
+      return <div>Loading</div>
+    }
+
   }
 }
 
