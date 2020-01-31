@@ -11,6 +11,9 @@ const device = {
   }
 };
 
+const host = process.env.host || "localhost";
+const port = process.env.port || "3667";
+
 const startTemp = 60;
 const minTemp = 50;
 
@@ -19,9 +22,10 @@ let light = 0;
 let fan = 0;
 
 const connection = function() {
-  const ws = new WebSocket("ws://homey:3667");
+  const ws = new WebSocket("ws://" + host + ":" + port);
 
   ws.on("open", () => {
+    console.log("Connected to " + host + ":" + port);
     ws.send(
       JSON.stringify({
         key: "device",
@@ -64,25 +68,25 @@ const connection = function() {
     if (data.key === "fireplace_temp_bottom") {
       temp = data.value;
       let decision = logic();
-      sendRequest(decision, data.transaction_id);
+      sendRequest(decision, data);
     }
     if (data.key === "livingroom_light") {
       light = data.value;
       let decision = logic();
-      sendRequest(decision, data.transaction_id);
+      sendRequest(decision, data);
     }
     if (data.key === "fireplace_fan") {
       fan = data.value;
     }
   });
 
-  function sendRequest(decision, transaction_id) {
+  function sendRequest(decision, data) {
     if (decision) {
       ws.send(
         JSON.stringify({
           key: "fireplace_fan",
-          transaction_id: transaction_id,
-          trail: { origin: "fireplace_logic_request" },
+          origin: data.key,
+          transaction_id: data.transaction_id,
           value: decision
         })
       );

@@ -3,14 +3,15 @@ const WebSocket = require('ws');
 
 const magic = "magic";
 
-
+const host = process.env.host || "localhost";
+const port = process.env.port || "3667";
 
 const device = {
     id: "m1",
     name: "mock device",
     states: {
         temperature_mock: { location: "kitchen", unit: "°C" },
-        possible_error_mock: { location: "livingroom", unit: "happy" },
+        possible_error_mock: { location: "livingroom", unit: "°C" },
         light_top: { location: "other room", type: "switch" }
     }
 }
@@ -18,9 +19,10 @@ const device = {
 let someState = 0;
 
 const connection = function () {
-    const ws = new WebSocket('ws://localhost:3667');
+    const ws = new WebSocket("ws://" + host + ":" + port);
 
     ws.on('open', () => {
+        console.log("Connected to " + host + ":" + port);
         ws.send(JSON.stringify({
             key: 'device',
             value: device
@@ -68,7 +70,8 @@ const connection = function () {
     });
 
     setInterval(() => {
-        let newVal = Math.ceil(Math.random() * 100);
+        let mult = (someState === 0) ? 3 : 100;
+        let newVal = Math.ceil(Math.random() * mult);
 
         ws.send(JSON.stringify({
             key: 'temperature_mock',
@@ -89,7 +92,7 @@ const connection = function () {
             key: 'possible_error_mock',
             value: newVal
         }));
-    }, 5500)
+    }, 10300)
 
 }
 

@@ -135,26 +135,45 @@ async function getLogs(cb) {
 
 
 async function getEvents(key, query, cb) {
-    let text = "SELECT key, inserted, value FROM events WHERE key = $1 ORDER BY inserted desc";
+    let select = "SELECT key, inserted, value FROM events WHERE key = $1";
+    let where = "";
+    let order = "ORDER BY inserted desc";
+    let limit = "";
     let params = [key];
 
-    switch (query.type) {
-        case "count":
-            text += " LIMIT $2";
-            params.push(query.last);
-
-            break;
-        case "days": /// FIXME probably better to use time or inserted as key word...
-            // TODO
-
-            break;
+    if (!query.form && !query.limit) {
+        cb(Error("Missing 'from' or 'limit' from query: " + JSON.stringify(query)), undefined);
+        return
     }
 
+    if (!query.to) {
+        let now = Date.now();
+        query.to = new Date(now).toISOString();
+    }
+
+    where += "AND inserted <= $2 "
+    params.push(query.to);
+
+    if (query.from) {
+        // TODO check for ISOString
+        where += "AND inserted > $3 "
+        params.push(query.from);
+    } else {
+        limit += "LIMIT $3";
+        params.push(query.limit);
+    }
+
+    console.log("params: " + JSON.stringify(params));
+
+    let sql = [select, where, order, limit].join(" ");
+
+    console.log(sql);
+
     try {
-        let retr = await db().query(text, params);
+        let retr = await db().query(sql, params);
         cb(false, retr);
     } catch (e) {
-        cb(e, false)
+        cb(e, false);
     }
 }
 

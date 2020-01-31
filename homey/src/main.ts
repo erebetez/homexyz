@@ -322,7 +322,6 @@ function notificationHandler(channel, row) {
 
       break;
     case "devices":
-      // TODO don't use butSender function. send to everyone including sender.
       connectionHandler.broadcast({ key: "devices", value: row });
       break;
     default:

@@ -28,15 +28,32 @@ socket.addEventListener("open", function(event) {
   );
 });
 
-function listenerHandler(key, cb) {
-  return event => {
-    console.log(event);
+const messageHandler = (function() {
+  let observers = {};
+
+  socket.addEventListener("message", event => {
+    // console.log(event);
     let data = JSON.parse(event.data);
-    if (data.key === key) {
-      cb(data);
+    let observer = observers[data.key];
+    if (observer) {
+      observer.forEach(handler => {
+        handler(data);
+      });
+    }
+  });
+
+  return {
+    addListener: (key, func) => {
+      let keyList = observers[key];
+      if (keyList) {
+        keyList.push(func);
+      } else {
+        keyList = [func];
+      }
+      observers[key] = keyList;
     }
   };
-}
+})();
 
 class ServiceData extends React.Component {
   constructor(props) {
@@ -54,16 +71,13 @@ class ServiceData extends React.Component {
     this.fetchDevices();
     this.fetchStates();
 
-    socket.addEventListener(
-      "message",
-      listenerHandler("devices", data => {
-        // getting only the updated device
-        let newState = this.state.devices;
-        let device = data.value;
-        newState[device.id] = device;
-        this.setState({ devices: newState });
-      })
-    );
+    messageHandler.addListener("devices", data => {
+      // getting only the updated device
+      let newState = this.state.devices;
+      let device = data.value;
+      newState[device.id] = device;
+      this.setState({ devices: newState });
+    });
   }
 
   async fetchDevices() {
@@ -115,77 +129,92 @@ class Events extends React.Component {
     super(props);
     this.state = {
       err: false,
-      eventList: [], // newest item in 0
+      eventDict: {}, // newest item in 0
       loading: false
     };
   }
 
   componentDidMount() {
-    this.fetchEvent();
+    this.setState({ loading: true });
+    //console.log(this.props.select);
 
-    socket.send(
-      JSON.stringify({
-        key: "register",
-        value: {
-          id: device.id,
-          key: this.props.select
+    this.props.select.forEach(key => {
+      this.fetchEvent(key);
+
+      socket.send(
+        JSON.stringify({
+          key: "register",
+          value: {
+            id: device.id,
+            key: key
+          }
+        })
+      );
+
+      messageHandler.addListener(key, data => {
+        let keyDict = this.state.eventDict;
+        // TODO use data key instead?
+        let keyList = keyDict[key];
+        if (!keyList) {
+          keyList = [];
         }
-      })
-    );
 
-    socket.addEventListener(
-      "message",
-      listenerHandler(this.props.select, data => {
-        let l = this.state.eventList;
-
-        if (l.length > this.props.last) {
-          l.pop();
+        if (keyList.length > (this.props.limit || 1)) {
+          keyList.pop();
         }
 
-        l.unshift(data);
-        this.setState({ eventList: l });
-      })
-    );
+        keyList.unshift(data);
+        keyDict[key] = keyList;
+        this.setState({ eventDict: keyDict });
+      });
+    });
   }
 
-  async fetchEvent() {
-    this.setState({ loading: true });
+  async fetchEvent(key) {
+    let query = "/events/" + key;
 
-    let query = "/events/" + this.props.select;
-    if (this.props.last) {
-      query += "?last=" + this.props.last + "&type=count";
-    }
+    let now = Date.now();
+
+    let limit = this.props.limit || "1";
+    let from = this.props.from || new Date(now - 86400000).toISOString(); // default one day
+    let to = this.props.to || new Date(now).toISOString();
+
+    query += "?limit=" + limit + "&from=" + from + "&to=" + to;
+
+    console.log(query);
 
     fetchService(query, (err, newEvents) => {
       if (err) {
         this.setState({ err });
       } else {
+        let keyDict = this.state.eventDict;
+
+        console.log(newEvents);
+
+        // NOTE overwrite existing events
+        keyDict[key] = newEvents;
+
         this.setState({
           loading: false,
-          eventList: newEvents
+          eventDict: keyDict
         });
       }
     });
   }
 
-  async setEvent(origin, value) {
-    //this.setState({ loading: true });
-    socket.send(
-      JSON.stringify({
-        key: this.props.select,
-        trail: { origin: origin },
-        value: value
-      })
-    );
-  }
-
   render() {
-    return this.props.children(
-      this.state.err,
-      this.state.eventList,
-      this.setEvent.bind(this)
-    );
+    return this.props.children(this.state.err, this.state.eventDict);
   }
+}
+
+function sendEvent(key, value, origin) {
+  socket.send(
+    JSON.stringify({
+      key: key,
+      trail: { origin: origin || "button" },
+      value: value
+    })
+  );
 }
 
 async function fetchService(query, cb) {
@@ -204,4 +233,4 @@ async function fetchService(query, cb) {
   }
 }
 
-export { ServiceData, Events };
+export { ServiceData, Events, sendEvent };
