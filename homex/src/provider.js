@@ -21,8 +21,6 @@ socket.addEventListener("open", function(event) {
   socket.send(
     JSON.stringify({
       key: "device",
-      origin: false,
-      transaction_id: false,
       value: device
     })
   );
