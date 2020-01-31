@@ -85,7 +85,10 @@ const connection = function() {
       ws.send(
         JSON.stringify({
           key: "fireplace_fan",
-          origin: data.key,
+          trail: {
+            trigger: data.key,
+            origin: "fireplace_logic_request"
+          },
           transaction_id: data.transaction_id,
           value: decision
         })
