@@ -1,6 +1,14 @@
 import React from "react";
 import { sendEvent } from "./provider.js";
-import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, Legend } from "recharts";
+import {
+  LineChart,
+  Line,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend
+} from "recharts";
 
 function LastValue(props) {
   if (props.state && props.eventList && props.eventList.length > 0) {
@@ -14,8 +22,15 @@ function LastValue(props) {
   }
 }
 
-const getColor = function () {
-  const colors = ['#191102', '#994636', '#f3b61f', '#a29f15', '#510d0a', '#895b1e'];
+const getColor = function() {
+  const colors = [
+    "#191102",
+    "#994636",
+    "#f3b61f",
+    "#a29f15",
+    "#510d0a",
+    "#895b1e"
+  ];
   let idx = 0;
 
   return () => {
@@ -26,26 +41,24 @@ const getColor = function () {
     }
 
     return colors[idx];
-  }
-}
-
+  };
+};
 
 function HistoryDisplay(props) {
   if (!props.states || Object.keys(props.states).length === 0) {
     return <div>state not existing</div>;
   }
   if (!props.eventDict || Object.keys(props.eventDict).length === 0) {
-    return <div>no value yet</div>
+    return <div>no value yet</div>;
   }
 
   const color = getColor();
 
   let data = Object.keys(props.eventDict).reduce((acc, key) => {
-
     let keyList = props.eventDict[key];
     keyList = keyList.map(event => {
       event[key] = event.value;
-      event["parsed"] = Date.parse(event["inserted"])
+      event["parsed"] = Date.parse(event["inserted"]);
       return event;
     });
     return acc.concat(keyList);
@@ -71,21 +84,29 @@ function HistoryDisplay(props) {
         />
 
         {Object.keys(props.eventDict).map(key => {
-          // TODO group/reduce by unit.... 
+          // TODO group/reduce by unit....
           if (props.states[key]) {
             let hide;
             switch (props.states[key].attribute.type) {
-              case 'switch':
+              case "switch":
                 hide = true;
                 break;
 
               default:
-                hide = false
+                hide = false;
                 break;
             }
-            return <YAxis key={key} yAxisId={key} hide={hide} dataKey={key} unit={props.states[key].attribute.unit} />
+            return (
+              <YAxis
+                key={key}
+                yAxisId={key}
+                hide={hide}
+                dataKey={key}
+                unit={props.states[key].attribute.unit}
+              />
+            );
           } else {
-            return <div key="dummy"></div>
+            return <div key="dummy"></div>;
           }
         })}
 
@@ -93,21 +114,37 @@ function HistoryDisplay(props) {
           if (props.states[key]) {
             let type;
             switch (props.states[key].attribute.type) {
-              case 'switch':
+              case "switch":
                 type = "stepBefore";
                 break;
 
               default:
-                type = "monotone"
+                type = "monotone";
                 break;
             }
-            return <Line key={key} yAxisId={key} dot={false} type={type} dataKey={key} stroke={color()} />
+            return (
+              <Line
+                key={key}
+                yAxisId={key}
+                dot={false}
+                type={type}
+                dataKey={key}
+                stroke={color()}
+              />
+            );
           } else {
-            return <Line key={key} yAxisId={key} dot={false} type="monotone" dataKey={key} stroke={color()} />
+            return (
+              <Line
+                key={key}
+                yAxisId={key}
+                dot={false}
+                type="monotone"
+                dataKey={key}
+                stroke={color()}
+              />
+            );
           }
-
         })}
-
       </LineChart>
     </div>
   );
