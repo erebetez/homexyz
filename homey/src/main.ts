@@ -154,17 +154,15 @@ const connectionHandler = (function() {
       ws.on("message", async message => {
         console.log("got: %s", message);
 
-        let event = undefined;
+        let event;
         try {
           event = JSON.parse(message);
         } catch (err) {
           dbError(err, { message: message });
-        }
-
-        if (event === undefined) {
           return;
         }
 
+        // catch reserved key's
         switch (event.key) {
           case "device": {
             let device = event.value;
