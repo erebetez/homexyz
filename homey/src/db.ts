@@ -9,11 +9,11 @@ let db = (function() {
       return pool;
     } else {
       pool = new Pool({
-        user: "dbuser",
-        host: "database.server.com",
-        database: "mydb",
-        password: "secretpassword",
-        port: 3211
+        host: process.env.PGHOST || "localhost",
+        port: process.env.PGPORT || "5432",
+        database: process.env.PGDATABASE || "homez",
+        user: process.env.PGUSER || "homez",
+        password: process.env.PGPASSWORD
       });
 
       pool.on("error", (err: Error) => {
