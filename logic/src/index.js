@@ -11,8 +11,8 @@ const device = {
   }
 };
 
-const host = process.env.host || "localhost";
-const port = process.env.port || "3667";
+const host = process.env.homeyhost || "localhost";
+const port = process.env.homeyport || "3667";
 
 const startTemp = 60;
 const minTemp = 50;
