@@ -1,0 +1,10 @@
+{
+  "name": "mockclient",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "ws": "^7.2.0"
+  },
+  "scripts": {},
+  "devDependencies": {}
+}
