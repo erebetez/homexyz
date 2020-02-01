@@ -4,7 +4,7 @@
 #include <DallasTemperature.h>
 #include <OneWire.h>
 
-const char *ssid = "ssid";
+const char *ssid = "powder";
 const char *password = "123456";
 const char *websockets_server = "ws://moria:3667";
 
@@ -102,6 +102,7 @@ void onMessageCallback(WebsocketsMessage message)
     if (strcmp(key, "fireplace_fan") == 0)
     {
 
+      int oldValue = fanOn;
       fanOn = event["value"];
 
       if (fanOn == 1)
@@ -113,7 +114,10 @@ void onMessageCallback(WebsocketsMessage message)
         digitalWrite(output2, HIGH);
       }
 
-      client.send("{\"key\": \"fireplace_fan\", \"transaction_id\": \"" + String(transaction_id) + "\", \"value\":" + String(fanOn) + "}");
+      if (oldValue != fanOn)
+      {
+        client.send("{\"key\": \"fireplace_fan\", \"transaction_id\": \"" + String(transaction_id) + "\", \"value\":" + String(fanOn) + "}");
+      }
     }
     else
     {
@@ -208,12 +212,15 @@ void readDataTemperatureOneWire()
   if (newT == -127)
   {
     Serial.println("Failed to read temperature from DS18B20 sensor!");
-    client.send("{\"key\": \"fireplace_temp_bottom\", \"value\": null}");
-    client.send("{\"key\": \"log\", \"value\": {\"id\": " + id + ", \"key\": \"fireplace_temp_bottom\", \"message\": \"Failed to read temperature from DS18B20 sensor!\" }}");
-    return;
-  }
+    if (tempBottom != -127)
+    {
+      client.send("{\"key\": \"fireplace_temp_bottom\", \"value\": null}");
+      client.send("{\"key\": \"log\", \"value\": {\"id\": \"" + id + "\", \"key\": \"fireplace_temp_bottom\", \"message\": \"Failed to read temperature from DS18B20 sensor!\" }}");
+    }
 
-  if (tempBottom != newT)
+    tempBottom = newT;
+  }
+  else if (abs(tempBottom - newT) > 1)
   {
     tempBottom = newT;
     Serial.println(tempBottom);
