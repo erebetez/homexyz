@@ -190,8 +190,6 @@ class Events extends React.Component {
       } else {
         let keyDict = this.state.eventDict;
 
-        console.log(newEvents);
-
         // NOTE overwrite existing events
         keyDict[key] = newEvents;
 

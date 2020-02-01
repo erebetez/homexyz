@@ -175,11 +175,10 @@ async function getEvents(key, query, cb) {
     params.push(query.limit);
   }
 
-  console.log("params: " + JSON.stringify(params));
-
   let sql = [select, where, order, limit].join(" ");
 
-  console.log(sql);
+  // console.log(sql);
+  // console.log("params: " + JSON.stringify(params));
 
   try {
     let retr = await db().query(sql, params);
