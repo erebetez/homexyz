@@ -26,6 +26,7 @@ const devicePingInterval = 1000 * 60 * 60 * 5;
 // TODO's
 
 // - SSL for https
+// - header auth for websocket
 
 const ensureEventObject = function(event) {
   if (!event.transaction_id) {
