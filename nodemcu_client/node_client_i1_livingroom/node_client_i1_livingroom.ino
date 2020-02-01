@@ -287,7 +287,7 @@ void readDataHumidity()
 
     h = -127;
   }
-  else if (abs(h - newH) > 0.5)
+  else if (abs(h - newH) > 2)
   {
     h = newH;
     Serial.println(h);
