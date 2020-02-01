@@ -51,7 +51,8 @@ function App() {
                   select={[
                     "fireplace_temp_bottom",
                     "temperature2",
-                    "humidity1"
+                    "humidity1",
+                    "fireplace_fan"
                   ]}
                   from={new Date(Date.now() - 14400000).toISOString()}
                 >
