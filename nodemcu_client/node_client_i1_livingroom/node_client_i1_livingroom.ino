@@ -6,7 +6,7 @@
 #include <DallasTemperature.h>
 #include <OneWire.h>
 
-const char *ssid = "ssid";
+const char *ssid = "powder";
 const char *password = "123456";
 const char *websockets_server = "ws://moria:3667";
 
@@ -232,11 +232,14 @@ void readDataTemperatureDHT()
   if (isnan(newT))
   {
     Serial.println("Failed to read temperature from DHT sensor!");
-    client.send("{\"key\": \"temperature1\", \"value\": null}");
-    return;
-  }
+    if (t1 != -127)
+    {
+      client.send("{\"key\": \"temperature1\", \"value\": null}");
+    }
 
-  if (t1 != newT)
+    t1 = -127;
+  }
+  else if (abs(t1 - newT) > 0.5)
   {
     t1 = newT;
     Serial.println(t1);
@@ -254,12 +257,13 @@ void readDataTemperatureOneWire()
   if (newT == -127)
   {
     Serial.println("Failed to read temperature from DS18B20 sensor!");
-    client.send("{\"key\": \"temperature2\", \"value\": null}");
-    return;
+    if (t2 != -127)
+    {
+      client.send("{\"key\": \"temperature2\", \"value\": null}");
+    }
+    t2 = newT;
   }
-
-  // TODO use treshould i.e 0.5°C. Maybe round value.
-  if (t2 != newT)
+  else if (abs(t2 - newT) > 0.5)
   {
     t2 = newT;
     Serial.println(t2);
@@ -276,11 +280,14 @@ void readDataHumidity()
   if (isnan(newH))
   {
     Serial.println("Failed to read humidity from DHT sensor!");
-    client.send("{\"key\": \"humidity1\", \"value\": null}");
-    return;
-  }
+    if (h != -127)
+    {
+      client.send("{\"key\": \"humidity1\", \"value\": null}");
+    }
 
-  if (h != newH)
+    h = -127;
+  }
+  else if (abs(h - newH) > 0.5)
   {
     h = newH;
     Serial.println(h);
