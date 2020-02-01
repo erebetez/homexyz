@@ -50,10 +50,10 @@ function App() {
                 <Events
                   select={[
                     "fireplace_temp_bottom",
-                    "temperature1",
                     "temperature2",
                     "humidity1"
                   ]}
+                  from={new Date(Date.now() - 14400000).toISOString()}
                 >
                   {(err, eventDict) => (
                     <div>
