@@ -150,7 +150,7 @@ async function getEvents(key, query, cb) {
   let limit = "";
   let params = [key];
 
-  if (!query.form && !query.limit) {
+  if (!query.from && !query.limit) {
     cb(
       Error("Missing 'from' or 'limit' from query: " + JSON.stringify(query)),
       undefined
