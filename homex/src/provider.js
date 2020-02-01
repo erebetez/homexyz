@@ -173,11 +173,14 @@ class Events extends React.Component {
 
     let now = Date.now();
 
-    let limit = this.props.limit || "1";
-    let from = this.props.from || new Date(now - 86400000).toISOString(); // default one day
-    let to = this.props.to || new Date(now).toISOString();
+    if (this.props.limit) {
+      query += "?limit=" + this.props.limit;
+    } else {
+      let from = this.props.from || new Date(now - 86400000).toISOString(); // default one day
+      let to = this.props.to || new Date(now).toISOString();
 
-    query += "?limit=" + limit + "&from=" + from + "&to=" + to;
+      query += "?from=" + from + "&to=" + to;
+    }
 
     console.log(query);
 

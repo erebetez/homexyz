@@ -88,10 +88,6 @@ function App() {
                 <Events select={["led1", "led2"]} limit="1">
                   {(err, eventDict) => (
                     <div>
-                      <LastValue
-                        eventList={eventDict.led1}
-                        state={states.led1}
-                      ></LastValue>
                       <ToggleButton
                         key="button_led1"
                         name="button_led1"
@@ -108,7 +104,7 @@ function App() {
 
                 <hr></hr>
                 <h4>Mockdevice</h4>
-                <Events select={["light_top"]} type="count">
+                <Events select={["light_top"]} limit="1">
                   {(err, eventDict) => (
                     <div>
                       <LastValue
