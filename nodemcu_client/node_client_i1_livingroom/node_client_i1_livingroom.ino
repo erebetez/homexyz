@@ -6,10 +6,9 @@
 #include <DallasTemperature.h>
 #include <OneWire.h>
 
-const char* ssid     = "ssid";
-const char* password = "123456";
-const char* websockets_server = "ws://moria:3667";
-
+const char *ssid = "ssid";
+const char *password = "123456";
+const char *websockets_server = "ws://moria:3667";
 
 // Device properties
 const String id = "i1";
@@ -18,7 +17,6 @@ const String desc = "Corner of livingroom";
 
 String states = "";
 
-
 // Assign output variables to GPIO pins
 const int output2 = 2;
 const int output4 = 4;
@@ -26,20 +24,19 @@ const int output4 = 4;
 // DHT11
 const int input5 = 5;
 
-
 // KY035
 const int input0 = A0;
-int a0inputVal  = 0;
+int a0inputVal = 0;
 
 // DS18B20
 #define ONE_WIRE_BUS 13
 
 // sensor setup
 
-OneWire oneWire(ONE_WIRE_BUS); 
+OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
 
-#define DHTTYPE    DHT11
+#define DHTTYPE DHT11
 
 DHT dht(input5, DHTTYPE);
 
@@ -58,8 +55,8 @@ float h = 0.0;
 using namespace websockets;
 WebsocketsClient client;
 
-
-void setup() {
+void setup()
+{
   Serial.begin(115200);
 
   // Initialize the output variables as outputs
@@ -73,7 +70,6 @@ void setup() {
   dht.begin();
   sensors.begin();
 
-
   // Set states
   states = "{";
   states += "\"led1\": {\"location\": \"livingroom\",\"type\": \"switch\",\"range\": [0,1]},";
@@ -86,11 +82,11 @@ void setup() {
   // Connect to wifi
   WiFi.begin(ssid, password);
 
-
   // Wait some time to connect to wifi
-  for(int i = 0; i < 10 && WiFi.status() != WL_CONNECTED; i++) {
-      Serial.print(".");
-      delay(1000);
+  for (int i = 0; i < 10 && WiFi.status() != WL_CONNECTED; i++)
+  {
+    Serial.print(".");
+    delay(1000);
   }
 
   // Print local IP address and start web server
@@ -100,92 +96,110 @@ void setup() {
   Serial.println(WiFi.localIP());
   Serial.println("");
 
-
-
   // Setup Callbacks
   client.onMessage(onMessageCallback);
   client.onEvent(onEventsCallback);
 }
 
-void onMessageCallback(WebsocketsMessage message) {
-    Serial.print("Got Message: ");
-    Serial.println(message.data());
-    
-    if (message.data().indexOf("{\"key\":\"") == 0){
+void onMessageCallback(WebsocketsMessage message)
+{
+  Serial.print("Got Message: ");
+  Serial.println(message.data());
 
-      // maybe faster to check for key the c way. do json pars only for interesting messages.
-      // Serial.print(message.data().indexOf("temperature1"));
+  if (message.data().indexOf("{\"key\":\"") == 0)
+  {
 
+    // maybe faster to check for key the c way. do json pars only for interesting messages.
+    // Serial.print(message.data().indexOf("temperature1"));
 
-      DynamicJsonDocument event(1024);
-      deserializeJson(event, message.data());
+    DynamicJsonDocument event(1024);
+    deserializeJson(event, message.data());
 
-      const char* key = event["key"];
-      const char* transaction_id = event["transaction_id"];
-      
-      if (strcmp(key, "led1") == 0) {
+    const char *key = event["key"];
+    const char *transaction_id = event["transaction_id"];
 
-        int oldValue = output2State;
-        output2State = event["value"];
+    if (strcmp(key, "led1") == 0)
+    {
 
-        if (output2State == 1) {
-          digitalWrite(output2, HIGH);
-        } else {
-          digitalWrite(output2, LOW);
-        }
+      int oldValue = output2State;
+      output2State = event["value"];
 
-        // NOTE in order to prevent infinit loops between server and client. Last server implementation does not broadcast to sender. So risiko is small now.
-        if (oldValue != output2State) {
-           client.send("{\"key\": \"led1\", \"transaction_id\": \"" + String(transaction_id) + "\", \"value\":" + String(output2State) + "}");
-        }      
+      if (output2State == 1)
+      {
+        digitalWrite(output2, HIGH);
       }
-      else if (strcmp(key, "led2") == 0) {
+      else
+      {
+        digitalWrite(output2, LOW);
+      }
 
-        int oldValue = output4State;
-        output4State = event["value"];
-
-        if (output4State == 1) {
-          digitalWrite(output4, HIGH);
-        } else {
-          digitalWrite(output4, LOW);
-        }
-
-        if (oldValue != output4State) {
-          client.send("{\"key\": \"led2\", \"transaction_id\": \"" + String(transaction_id) + "\", \"value\":" + String(output4State) + "}");
-        }
-      } 
-      else {
-           Serial.print("Not interesetd in: ");
-           Serial.print(key);
+      // NOTE in order to prevent infinit loops between server and client. Last server implementation does not broadcast to sender. So risiko is small now.
+      if (oldValue != output2State)
+      {
+        client.send("{\"key\": \"led1\", \"transaction_id\": \"" + String(transaction_id) + "\", \"value\":" + String(output2State) + "}");
       }
     }
-}
+    else if (strcmp(key, "led2") == 0)
+    {
 
-void onEventsCallback(WebsocketsEvent event, String data) {
-    if(event == WebsocketsEvent::ConnectionOpened) {
-        Serial.println("Connnection Opened");
-        client.send("{\"key\": \"device\", \"value\": {\"id\": \"" + id + "\",\"name\": \"" + name + "\",\"desc\": \"" + desc + "\",\"states\": " + states + "}}");
+      int oldValue = output4State;
+      output4State = event["value"];
 
-        delay(2000);
-        // TODO register both leds
-        client.send("{\"key\": \"register\", \"value\": {\"key\": \"led1\", \"id\":" + id + "}}");
-        client.send("{\"key\": \"register\", \"value\": {\"key\": \"led2\", \"id\":" + id + "}}");
+      if (output4State == 1)
+      {
+        digitalWrite(output4, HIGH);
+      }
+      else
+      {
+        digitalWrite(output4, LOW);
+      }
 
-    } else if(event == WebsocketsEvent::ConnectionClosed) {
-        Serial.println("Connnection Closed");
-    } else if(event == WebsocketsEvent::GotPing) {
-        Serial.println("Got a Ping!");
-    } else if(event == WebsocketsEvent::GotPong) {
-        Serial.println("Got a Pong!");
+      if (oldValue != output4State)
+      {
+        client.send("{\"key\": \"led2\", \"transaction_id\": \"" + String(transaction_id) + "\", \"value\":" + String(output4State) + "}");
+      }
     }
+    else
+    {
+      Serial.print("Not interesetd in: ");
+      Serial.print(key);
+    }
+  }
 }
 
+void onEventsCallback(WebsocketsEvent event, String data)
+{
+  if (event == WebsocketsEvent::ConnectionOpened)
+  {
+    Serial.println("Connnection Opened");
+    client.send("{\"key\": \"device\", \"value\": {\"id\": \"" + id + "\",\"name\": \"" + name + "\",\"desc\": \"" + desc + "\",\"states\": " + states + "}}");
 
-void loop() {
+    delay(2000);
+
+    client.send("{\"key\": \"register\", \"value\": {\"key\": \"led1\", \"id\": \"" + id + "\"}}");
+    client.send("{\"key\": \"register\", \"value\": {\"key\": \"led2\", \"id\": \"" + id + "\"}}");
+  }
+  else if (event == WebsocketsEvent::ConnectionClosed)
+  {
+    Serial.println("Connnection Closed");
+  }
+  else if (event == WebsocketsEvent::GotPing)
+  {
+    Serial.println("Got a Ping!");
+  }
+  else if (event == WebsocketsEvent::GotPong)
+  {
+    Serial.println("Got a Pong!");
+  }
+}
+
+void loop()
+{
   webSocketConnect();
 
   long currentMillis = millis();
-  if(currentMillis - lastMillis > interval){
+  if (currentMillis - lastMillis > interval)
+  {
     lastMillis = currentMillis;
     readDataTemperatureDHT();
     readDataTemperatureOneWire();
@@ -193,33 +207,37 @@ void loop() {
   }
 }
 
-
-
-void webSocketConnect(){
-  if(client.available()) {
+void webSocketConnect()
+{
+  if (client.available())
+  {
     client.poll();
   }
-  else if (client.connect(websockets_server)) {
+  else if (client.connect(websockets_server))
+  {
     Serial.println("Connected to ws.");
   }
-  else {
+  else
+  {
     Serial.println("Could not connect to server: '" + String(websockets_server) + "'");
     delay(1000);
   }
 }
 
-void readDataTemperatureDHT(){
+void readDataTemperatureDHT()
+{
   // Read temperature as Celsius (the default)
   float newT = dht.readTemperature();
 
-  if (isnan(newT)) {
+  if (isnan(newT))
+  {
     Serial.println("Failed to read temperature from DHT sensor!");
     client.send("{\"key\": \"temperature1\", \"value\": null}");
     return;
   }
 
-
-  if (t1 != newT){
+  if (t1 != newT)
+  {
     t1 = newT;
     Serial.println(t1);
     client.send("{\"key\": \"temperature1\", \"value\":" + String(t1) + "}");
@@ -227,19 +245,22 @@ void readDataTemperatureDHT(){
   return;
 }
 
-void readDataTemperatureOneWire(){
+void readDataTemperatureOneWire()
+{
   sensors.requestTemperatures();
 
   float newT = sensors.getTempCByIndex(0);
 
-  if (newT == -127) {
+  if (newT == -127)
+  {
     Serial.println("Failed to read temperature from DS18B20 sensor!");
     client.send("{\"key\": \"temperature2\", \"value\": null}");
     return;
   }
 
   // TODO use treshould i.e 0.5°C. Maybe round value.
-  if (t2 != newT){
+  if (t2 != newT)
+  {
     t2 = newT;
     Serial.println(t2);
     client.send("{\"key\": \"temperature2\", \"value\":" + String(t2) + "}");
@@ -247,17 +268,20 @@ void readDataTemperatureOneWire(){
   return;
 }
 
-void readDataHumidity(){
+void readDataHumidity()
+{
   // Read Humidity
   float newH = dht.readHumidity();
 
-  if (isnan(newH)) {
+  if (isnan(newH))
+  {
     Serial.println("Failed to read humidity from DHT sensor!");
     client.send("{\"key\": \"humidity1\", \"value\": null}");
     return;
   }
 
-  if(h != newH) {
+  if (h != newH)
+  {
     h = newH;
     Serial.println(h);
     client.send("{\"key\": \"humidity1\", \"value\":" + String(h) + "}");
