@@ -1,6 +1,5 @@
 version: "3"
 services:
-
   homex:
     build: ./homex
     depends_on:
