@@ -23,7 +23,10 @@ function App() {
                 <Devices devices={devices} states={states}></Devices>
                 <hr></hr>
                 <h4>Fireplace</h4>
-                <Events select={["fireplace_fan", "livingroom_light"]} last="1">
+                <Events
+                  select={["fireplace_fan", "livingroom_light"]}
+                  limit="1"
+                >
                   {(err, eventDict) => (
                     <div>
                       <span>Fan: </span>
@@ -51,7 +54,6 @@ function App() {
                     "temperature2",
                     "humidity1"
                   ]}
-                  last="100"
                 >
                   {(err, eventDict) => (
                     <div>
@@ -83,9 +85,13 @@ function App() {
 
                 <hr></hr>
                 <h4>Livingroom</h4>
-                <Events select={["led1", "led2"]} last="1">
+                <Events select={["led1", "led2"]} limit="1">
                   {(err, eventDict) => (
                     <div>
+                      <LastValue
+                        eventList={eventDict.led1}
+                        state={states.led1}
+                      ></LastValue>
                       <ToggleButton
                         key="button_led1"
                         name="button_led1"
@@ -196,7 +202,7 @@ class RangeChooser extends React.Component {
   }
 
   componentDidMount() {
-    this.state.from = this.state.to - this.state.range * 1000 * 60 * 60;
+    this.setState({ range: this.state.to - this.state.range * 1000 * 60 * 60 });
   }
 
   render() {
