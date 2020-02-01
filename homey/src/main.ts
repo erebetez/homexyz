@@ -198,8 +198,7 @@ const connectionHandler = (function() {
             getEvents(
               request.key,
               {
-                type: "count",
-                last: 1
+                limit: 1
               },
               (err, retr) => {
                 if (err) {
