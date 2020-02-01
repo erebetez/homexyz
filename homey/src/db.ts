@@ -10,7 +10,7 @@ let db = (function() {
     } else {
       pool = new Pool({
         host: process.env.PGHOST || "localhost",
-        port: process.env.PGPORT || "5432",
+        port: process.env.PGPORT || "3665",
         database: process.env.PGDATABASE || "homez",
         user: process.env.PGUSER || "homez",
         password: process.env.PGPASSWORD
