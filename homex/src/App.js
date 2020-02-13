@@ -199,7 +199,7 @@ class RangeChooser extends React.Component {
   }
 
   componentDidMount() {
-    this.setState({ range: this.state.to - this.state.range * 1000 * 60 * 60 });
+    this.setState({ from: this.state.to - this.state.range * 1000 * 60 * 60 });
   }
 
   render() {
@@ -211,7 +211,7 @@ class RangeChooser extends React.Component {
               class="btn btn-primary col-sm-2"
               onClick={this.clickBack.bind(this)}
             >
-              Back
+              {new Date(this.state.from).toISOString()}
             </button>
             <input
               class="form-control col-sm-2"
@@ -229,7 +229,7 @@ class RangeChooser extends React.Component {
               class="btn btn-primary col-sm-2"
               onClick={this.clickNext.bind(this)}
             >
-              forward
+              {new Date(this.state.to).toISOString()}
             </button>
           </div>
           {this.props.children(
