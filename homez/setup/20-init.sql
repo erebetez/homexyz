@@ -4,7 +4,7 @@ CREATE TABLE devices (id text PRIMARY KEY, name text NOT NULL, description text,
 CREATE TABLE states (key text PRIMARY KEY, id text REFERENCES devices NOT NULL, inserted timestamptz NOT NULL, updated timestamptz NOT NULL, attribute json);
 
 -- trail is a list of objects. each object can have a origin, timestamp, user, etc.
-CREATE TABLE events (key text REFERENCES states NOT NULL, inserted timestamptz NOT NULL, value json, trail json);
+CREATE TABLE events (key text REFERENCES states NOT NULL, inserted timestamptz NOT NULL, value jsonb, trail jsonb);
 
 CREATE TABLE logs (index SERIAL, id text REFERENCES devices, key text REFERENCES states, inserted timestamptz NOT NULL, loglevel text, message text, irritants json);
 
