@@ -1,6 +1,8 @@
 #include <ArduinoWebsockets.h>
 #include <ESP8266WiFi.h>
 #include <ArduinoJson.h>
+#include <Adafruit_Sensor.h>
+#include <DHT.h>
 #include <DallasTemperature.h>
 #include <OneWire.h>
 
@@ -9,9 +11,9 @@ const char *password = "123456";
 const char *websockets_server = "ws://moria:3667";
 
 // Device properties
-const String id = "i2";
-const String name = "fireplace";
-const String desc = "Next to fireplace";
+const String id = "i3";
+const String name = "corner";
+const String desc = "Livingroom Fireplace corner";
 
 String states = "";
 
@@ -21,6 +23,13 @@ const int input5 = 5;
 
 // DS18B20
 #define ONE_WIRE_BUS 4
+
+// DHT11
+const int input5 = 5;
+
+#define DHTTYPE DHT11
+
+DHT dht(input5, DHTTYPE);
 
 // sensor setup
 
@@ -48,19 +57,20 @@ void setup()
   Serial.begin(115200);
 
   // Initialize the output variables as outputs
-  pinMode(output2, OUTPUT);
+
   pinMode(input5, INPUT);
 
   // Set outputs to LOW
   digitalWrite(output2, HIGH);
 
+  dht.begin();
   sensors.begin();
 
   // Set states
   states = "{";
-  states += "\"fireplace_fan\": {\"location\": \"fireplace\",\"type\": \"switch\",\"range\": [0,1]},";
-  states += "\"livingroom_light\": {\"location\": \"livingroom\",\"type\": \"sensor\",\"range\": [0,1]},";
-  states += "\"fireplace_temp_bottom\": {\"location\": \"fireplace\",\"type\": \"sensor\", \"unit\": \"°C\"}";
+  states += "\"temperature1\": {\"location\": \"livingroom\",\"type\": \"sensor\", \"unit\": \"°C\"},";
+  states += "\"temperature2\": {\"location\": \"livingroom\",\"type\": \"sensor\", \"unit\": \"°C\"},";
+  states += "\"humidity1\": {\"location\": \"livingroom\",\"type\": \"sensor\", \"unit\": \"%\"}";
   states += "}";
 
   // Connect to wifi
@@ -102,25 +112,9 @@ void onMessageCallback(WebsocketsMessage message)
     const char *key = event["key"];
     const char *transaction_id = event["transaction_id"];
 
-    if (strcmp(key, "fireplace_fan") == 0)
+    if (strcmp(key, "bla_bla") == 0)
     {
-
-      int oldValue = fanOn;
-      fanOn = event["value"];
-
-      if (fanOn == 1)
-      {
-        digitalWrite(output2, LOW);
-      }
-      else
-      {
-        digitalWrite(output2, HIGH);
-      }
-
-      if (oldValue != fanOn)
-      {
-        client.send("{\"key\": \"fireplace_fan\", \"transaction_id\": \"" + String(transaction_id) + "\", \"value\":" + String(fanOn) + "}");
-      }
+      Serial.print("Nothing to controll");
     }
     else
     {
@@ -139,7 +133,7 @@ void onEventsCallback(WebsocketsEvent event, String data)
 
     delay(2000);
     // send register fireplace_fan
-    client.send("{\"key\": \"register\", \"value\": {\"key\": \"fireplace_fan\", \"id\": \"" + id + "\"}}");
+    //client.send("{\"key\": \"register\", \"value\": {\"key\": \"fireplace_fan\", \"id\": \"" + id + "\"}}");
   }
   else if (event == WebsocketsEvent::ConnectionClosed)
   {
@@ -164,7 +158,7 @@ void loop()
   {
     readIntervall_lastMillis = currentMillis;
     readDataTemperatureOneWire();
-    readLightSensor();
+    readDataTemperatureDHT();
   }
 }
 
@@ -185,25 +179,28 @@ void webSocketConnect()
   }
 }
 
-void readLightSensor()
+void readDataTemperatureDHT()
 {
-  int newValue = digitalRead(input5);
-  // Sensor return HIGH if light is off.
-  if (newValue == HIGH)
-  {
-    newValue = 0;
-  }
-  else
-  {
-    newValue = 1;
-  }
+  // Read temperature as Celsius (the default)
+  float newT = dht.readTemperature();
 
-  if (lightOn != newValue)
+  if (isnan(newT))
   {
-    lightOn = newValue;
-    Serial.println(newValue);
-    client.send("{\"key\": \"livingroom_light\", \"value\":" + String(lightOn) + "}");
+    Serial.println("Failed to read temperature from DHT sensor!");
+    if (t1 != -127)
+    {
+      client.send("{\"key\": \"temperature1\", \"value\": null}");
+    }
+
+    t1 = -127;
   }
+  else if (abs(t1 - newT) > 0.5)
+  {
+    t1 = newT;
+    Serial.println(t1);
+    client.send("{\"key\": \"temperature1\", \"value\":" + String(t1) + "}");
+  }
+  return;
 }
 
 void readDataTemperatureOneWire()
