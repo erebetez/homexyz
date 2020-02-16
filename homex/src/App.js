@@ -24,7 +24,13 @@ function App() {
                 <hr></hr>
                 <h4>Fireplace</h4>
                 <Events
-                  select={["fireplace_fan", "livingroom_light"]}
+                  select={[
+                    "fireplace_fan",
+                    "livingroom_light",
+                    "fireplace_temp_bottom",
+                    "temperature2",
+                    "humidity1"
+                  ]}
                   limit="1"
                 >
                   {(err, eventDict) => (
@@ -43,21 +49,6 @@ function App() {
                         eventList={eventDict.livingroom_light}
                         state={states.livingroom_light}
                       ></LastValue>
-                    </div>
-                  )}
-                </Events>
-
-                <Events
-                  select={[
-                    "fireplace_temp_bottom",
-                    "temperature2",
-                    "humidity1",
-                    "fireplace_fan"
-                  ]}
-                  from={new Date(Date.now() - 14400000).toISOString()}
-                >
-                  {(err, eventDict) => (
-                    <div>
                       <span>Temp bottom: </span>
                       <LastValue
                         eventList={eventDict.fireplace_temp_bottom}
@@ -75,7 +66,21 @@ function App() {
                         eventList={eventDict.humidity1}
                         state={states.humidity1}
                       ></LastValue>
+                    </div>
+                  )}
+                </Events>
 
+                <Events
+                  select={[
+                    "fireplace_temp_bottom",
+                    "temperature2",
+                    "humidity1",
+                    "fireplace_fan"
+                  ]}
+                  from={new Date(Date.now() - 344000000).toISOString()}
+                >
+                  {(err, eventDict) => (
+                    <div>
                       <HistoryDisplay
                         eventDict={eventDict}
                         states={states}
