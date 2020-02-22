@@ -144,7 +144,8 @@ async function getLogs(cb) {
 }
 
 async function getEvents(key, query, cb) {
-  let select = "SELECT key, inserted, value FROM events WHERE key = $1";
+  let select = "key, inserted, value";
+  let from = "FROM events WHERE key = $1";
   let where = "";
   let order = "ORDER BY inserted desc";
   let limit = "";
@@ -170,12 +171,30 @@ async function getEvents(key, query, cb) {
     // TODO check for ISOString
     where += "AND inserted > $3 ";
     params.push(query.from);
+
+    // } else if (query.limit === "max") {
+    //   select = "max((value)::text::decimal)";
+    //   where += "AND (value)::text <> 'null'";
+    //   order = "";
+
+    // } else if (query.limit === "min") {
+    //   select = "min((value)::text::decimal)"
+    //   where += "AND (value)::text <> 'null'";
+    //   order = "";
+
   } else {
+    // TODO check for integer
     limit += "LIMIT $3";
     params.push(query.limit);
   }
 
-  let sql = [select, where, order, limit].join(" ");
+
+  // TODO support a 'properties' query
+  // select count(*), max((value)::text::integer), min((value)::text::integer) from events where key = 'possible_error_mock' AND (value)::text <> 'null' AND inserted > '2020.02.20T00:00:00Z';
+
+
+
+  let sql = ["SELECT", select, from, where, order, limit].join(" ");
 
   // console.log(sql);
   // console.log("params: " + JSON.stringify(params));
