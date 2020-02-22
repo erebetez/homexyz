@@ -135,6 +135,7 @@ function App() {
                       select={[
                         "temperature_mock",
                         "possible_error_mock",
+                        "saw_mock",
                         "light_top"
                       ]}
                       from={from}
@@ -212,8 +213,23 @@ class RangeChooser extends React.Component {
       return (
         <div>
           <div class="form-group row">
+            <div class="col-sm-6">Range selector</div>
             <button
-              class="btn btn-primary col-sm-2"
+              class="btn btn-secondary col-sm-2"
+              onClick={this.clickNewest.bind(this)}
+            >
+              Date selector
+            </button>
+            <button
+              class="btn btn-secondary col-sm-2"
+              onClick={this.clickNewest.bind(this)}
+            >
+              To newest
+            </button>
+          </div>
+          <div class="form-group row">
+            <button
+              class="btn btn-primary col-sm-4"
               onClick={this.clickBack.bind(this)}
             >
               {new Date(this.state.from).toISOString()}
@@ -225,13 +241,7 @@ class RangeChooser extends React.Component {
               value={this.state.range}
             />
             <button
-              class="btn btn-secondary col-sm-2"
-              onClick={this.clickNewest.bind(this)}
-            >
-              To newest
-            </button>
-            <button
-              class="btn btn-primary col-sm-2"
+              class="btn btn-primary col-sm-4"
               onClick={this.clickNext.bind(this)}
             >
               {new Date(this.state.to).toISOString()}

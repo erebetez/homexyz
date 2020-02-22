@@ -17,7 +17,7 @@ const device = {
   }
 };
 
-socket.addEventListener("open", function(event) {
+socket.addEventListener("open", function (event) {
   socket.send(
     JSON.stringify({
       key: "device",
@@ -26,7 +26,7 @@ socket.addEventListener("open", function(event) {
   );
 });
 
-const messageHandler = (function() {
+const messageHandler = (function () {
   let observers = {};
 
   socket.addEventListener("message", event => {
@@ -151,13 +151,15 @@ class Events extends React.Component {
 
       messageHandler.addListener(key, data => {
         let keyDict = this.state.eventDict;
-        // TODO use data key instead?
+        // FIXME use data key instead?
         let keyList = keyDict[key];
         if (!keyList) {
           keyList = [];
         }
 
-        if (keyList.length > (this.props.limit || 1)) {
+        // TODO If inital time range does not return data, update will remain at 1 point. 
+        // In practice this should not happen often...
+        if (keyList.length > (this.props.limit || 0)) {
           keyList.pop();
         }
 

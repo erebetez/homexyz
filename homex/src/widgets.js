@@ -22,7 +22,7 @@ function LastValue(props) {
   }
 }
 
-const getColor = function() {
+const getColor = function () {
   const colors = [
     "#191102",
     "#994636",
@@ -85,6 +85,7 @@ function HistoryDisplay(props) {
 
         {Object.keys(props.eventDict).map(key => {
           // TODO group/reduce by unit....
+          // FIXME see https://github.com/recharts/recharts/issues/1065
           if (props.states[key]) {
             let hide;
             switch (props.states[key].attribute.type) {
