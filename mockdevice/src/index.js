@@ -12,13 +12,15 @@ const device = {
   states: {
     temperature_mock: { location: "kitchen", unit: "°C" },
     possible_error_mock: { location: "livingroom", unit: "°C" },
+    saw_mock: { location: "kitchen", unit: "rpm" },
     light_top: { location: "other room", type: "switch" }
   }
 };
 
 let someState = 0;
+let saw = 0;
 
-const connection = function() {
+const connection = function () {
   const ws = new WebSocket("ws://" + host + ":" + port);
 
   ws.on("open", () => {
@@ -74,6 +76,22 @@ const connection = function() {
       }
     }
   });
+
+
+  setInterval(() => {
+    saw += 1;
+
+    if (saw > 100) {
+      saw = 0;
+    }
+
+    ws.send(
+      JSON.stringify({
+        key: "saw_mock",
+        value: saw
+      })
+    );
+  }, 4500);
 
   setInterval(() => {
     let mult = someState === 0 ? 3 : 100;
