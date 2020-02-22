@@ -66,9 +66,11 @@ function HistoryDisplay(props) {
         let type;
         let unit = "";
         let hideXAxis = true;
+        let height = 120;
 
         if (i >= keyCount) {
           hideXAxis = false;
+          height += 30;
         }
 
         if (props.states[key]) {
@@ -89,7 +91,7 @@ function HistoryDisplay(props) {
         return (
           <LineChart
             width={730}
-            height={120}
+            height={height}
             data={data}
             margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
           >
