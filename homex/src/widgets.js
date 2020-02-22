@@ -22,7 +22,7 @@ function LastValue(props) {
   }
 }
 
-const getColor = function () {
+const getColor = function (idx) {
   const colors = [
     "#191102",
     "#994636",
@@ -31,17 +31,8 @@ const getColor = function () {
     "#510d0a",
     "#895b1e"
   ];
-  let idx = 0;
 
-  return () => {
-    idx = idx + 1;
-
-    if (idx >= colors.length) {
-      idx = 0;
-    }
-
-    return colors[idx];
-  };
+  return colors[(idx % colors.length)];
 };
 
 function HistoryDisplay(props) {
@@ -52,7 +43,7 @@ function HistoryDisplay(props) {
     return <div>no value yet</div>;
   }
 
-  const color = getColor();
+  const keyCount = Object.keys(props.eventDict).length - 1;
 
   let data = Object.keys(props.eventDict).reduce((acc, key) => {
     let keyList = props.eventDict[key];
@@ -64,89 +55,84 @@ function HistoryDisplay(props) {
     return acc.concat(keyList);
   }, []);
 
+
+  // TODO group/reduce by unit....
+  // FIXME see https://github.com/recharts/recharts/issues/1065
+  // FIXME data should contain only parse and the key values
+
   return (
     <div>
-      <LineChart
-        width={730}
-        height={350}
-        data={data}
-        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-      >
-        <CartesianGrid strokeDasharray="3 3" />
-        <Legend verticalAlign="top" height={36} />
-        <Tooltip />
+      {Object.keys(props.eventDict).map((key, i) => {
+        let type;
+        let unit = "";
+        let hideXAxis = true;
 
-        <XAxis
-          dataKey="parsed"
-          scale="time"
-          reversed="true"
-          tickFormatter={dateToString}
-        />
+        if (i >= keyCount) {
+          hideXAxis = false;
+        }
 
-        {Object.keys(props.eventDict).map(key => {
-          // TODO group/reduce by unit....
-          // FIXME see https://github.com/recharts/recharts/issues/1065
-          if (props.states[key]) {
-            let hide;
-            switch (props.states[key].attribute.type) {
-              case "switch":
-                hide = true;
-                break;
+        if (props.states[key]) {
+          unit = props.states[key].attribute.unit;
+          switch (props.states[key].attribute.type) {
+            case "switch":
+              type = "stepBefore";
+              break;
 
-              default:
-                hide = false;
-                break;
-            }
-            return (
-              <YAxis
-                key={key}
-                yAxisId={key}
-                hide={hide}
-                dataKey={key}
-                unit={props.states[key].attribute.unit}
-              />
-            );
-          } else {
-            return <div key="dummy"></div>;
+            default:
+              type = "monotone";
+              break;
           }
-        })}
+        } else {
+          type = "monotone";
+        }
 
-        {Object.keys(props.eventDict).map(key => {
-          if (props.states[key]) {
-            let type;
-            switch (props.states[key].attribute.type) {
-              case "switch":
-                type = "stepBefore";
-                break;
+        return (
+          <LineChart
+            width={730}
+            height={120}
+            data={data}
+            margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            {/* <Legend verticalAlign="left" layout="vertical" /> */}
+            <Tooltip />
 
-              default:
-                type = "monotone";
-                break;
-            }
-            return (
-              <Line
-                key={key}
-                yAxisId={key}
-                dot={false}
-                type={type}
-                dataKey={key}
-                stroke={color()}
-              />
-            );
-          } else {
-            return (
-              <Line
-                key={key}
-                yAxisId={key}
-                dot={false}
-                type="monotone"
-                dataKey={key}
-                stroke={color()}
-              />
-            );
-          }
+            <XAxis
+              dataKey="parsed"
+              scale="time"
+              reversed="true"
+              hide={hideXAxis}
+              tickFormatter={dateToString}
+            />
+
+            <YAxis
+              key={key}
+              yAxisId={key}
+              hide={false}
+              dataKey={key}
+              unit={unit}
+            />
+
+            <Line
+              key={key}
+              yAxisId={key}
+              dot={false}
+              type={type}
+              dataKey={key}
+              stroke={getColor(i)}
+            />
+
+          </LineChart>
+        )
+      })}
+
+      <ul>
+        {Object.keys(props.eventDict).map((key, i) => {
+          return (<li style={{ color: getColor(i) }}>{key}</li>)
         })}
-      </LineChart>
+      </ul>
+
+
     </div>
   );
 }
