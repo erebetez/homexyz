@@ -128,13 +128,10 @@ class Events extends React.Component {
     this.state = {
       err: false,
       eventDict: {}, // newest item in 0
-      loading: false
     };
   }
 
   componentDidMount() {
-    this.setState({ loading: true });
-    //console.log(this.props.select);
 
     this.props.select.forEach(key => {
       this.fetchEvent(key);
@@ -178,6 +175,7 @@ class Events extends React.Component {
     if (this.props.limit) {
       query += "?limit=" + this.props.limit;
     } else {
+
       let from = this.props.from || new Date(now - 86400000).toISOString(); // default one day
       let to = this.props.to || new Date(now).toISOString();
 
@@ -196,7 +194,6 @@ class Events extends React.Component {
         keyDict[key] = newEvents;
 
         this.setState({
-          loading: false,
           eventDict: keyDict
         });
       }

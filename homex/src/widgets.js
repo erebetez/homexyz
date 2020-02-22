@@ -49,6 +49,7 @@ function HistoryDisplay(props) {
     let keyList = props.eventDict[key];
     keyList = keyList.map(event => {
       event[key] = event.value;
+      // TODO check all have same range of time...
       event["parsed"] = Date.parse(event["inserted"]);
       return event;
     });
@@ -90,6 +91,7 @@ function HistoryDisplay(props) {
 
         return (
           <LineChart
+            key={key}
             width={730}
             height={height}
             data={data}
@@ -130,7 +132,7 @@ function HistoryDisplay(props) {
 
       <ul>
         {Object.keys(props.eventDict).map((key, i) => {
-          return (<li style={{ color: getColor(i) }}>{key}</li>)
+          return (<li key={i} style={{ color: getColor(i) }}>{key}</li>)
         })}
       </ul>
 

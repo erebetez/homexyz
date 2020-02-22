@@ -131,16 +131,15 @@ function App() {
                 <RangeChooser>
                   {(from, to) => (
                     <Events
-                      key="mock-graph"
+                      key={from} // FIXME not the nice way
+                      from={from}
+                      to={to}
                       select={[
                         "temperature_mock",
                         "possible_error_mock",
-                        "saw_mock",
-                        "light_top"
+                        "saw_mock"
                       ]}
-                      from={from}
-                      to={to}
-                      type="days"
+
                     >
                       {(err, eventDict) => (
                         <div>
@@ -157,6 +156,14 @@ function App() {
                             <LastValue
                               eventList={eventDict.possible_error_mock}
                               state={states.possible_error_mock}
+                            ></LastValue>
+                          </div>
+
+                          <div>
+                            <span>saw_mock: </span>
+                            <LastValue
+                              eventList={eventDict.saw_mock}
+                              state={states.saw_mock}
                             ></LastValue>
                           </div>
 
@@ -183,7 +190,7 @@ class RangeChooser extends React.Component {
     super(props);
     this.state = {
       auto: true,
-      range: 1,
+      range: 2, // days
       from: undefined,
       to: Date.now()
       // unit = days
@@ -191,17 +198,42 @@ class RangeChooser extends React.Component {
   }
 
   clickBack(ev) {
-    console.log(ev);
+    console.log("back");
+
+    let temp = this.state.from;
+
+    this.setState({
+      from: temp - this.state.range * 1000 * 60 * 60,
+      to: temp
+    });
+
   }
-  clickNext(ev) {
-    console.log(ev);
+  clickeForward(ev) {
+    console.log("forward");
+
+    let temp = this.state.to;
+
+    // TODO to can't be newer then now
+
+    this.setState({
+      from: temp,
+      to: temp + this.state.range * 1000 * 60 * 60
+    });
   }
+
   clickNewest(ev) {
-    console.log(ev);
+    console.log("newest");
   }
-  change(ev) {
-    console.log(ev);
-    this.setState({ range: ev.value });
+
+  clickDate(ev) {
+    console.log("date");
+  }
+
+  changeRange(ev) {
+    this.setState({
+      range: ev.target.value,
+      from: this.state.to - ev.target.value * 1000 * 60 * 60
+    });
   }
 
   componentDidMount() {
@@ -216,7 +248,7 @@ class RangeChooser extends React.Component {
             <div class="col-sm-6">Range selector</div>
             <button
               class="btn btn-secondary col-sm-2"
-              onClick={this.clickNewest.bind(this)}
+              onClick={this.clickDate.bind(this)}
             >
               Date selector
             </button>
@@ -227,6 +259,7 @@ class RangeChooser extends React.Component {
               To newest
             </button>
           </div>
+
           <div class="form-group row">
             <button
               class="btn btn-primary col-sm-4"
@@ -237,12 +270,12 @@ class RangeChooser extends React.Component {
             <input
               class="form-control col-sm-2"
               type="number"
-              onChange={this.change.bind(this)}
+              onChange={this.changeRange.bind(this)}
               value={this.state.range}
             />
             <button
               class="btn btn-primary col-sm-4"
-              onClick={this.clickNext.bind(this)}
+              onClick={this.clickeForward.bind(this)}
             >
               {new Date(this.state.to).toISOString()}
             </button>
