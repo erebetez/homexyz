@@ -5,6 +5,10 @@
   "dependencies": {
     "ws": "^7.2.0"
   },
-  "scripts": {},
-  "devDependencies": {}
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "jest": "^25.1.0"
+  }
 }
