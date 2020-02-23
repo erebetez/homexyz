@@ -1,11 +1,12 @@
 "use strict";
 const WebSocket = require("ws");
+const fireplaceLogic = require("./fireplace");
 
 const magic = "magic";
 
 const device = {
   id: "l1",
-  name: "fireplace logic",
+  name: "The logic service",
   states: {
     fireplace_logic_request: { type: "logic" }
   }
@@ -14,14 +15,9 @@ const device = {
 const host = process.env.homeyhost || "localhost";
 const port = process.env.homeyport || "3667";
 
-const startTemp = 60;
-const minTemp = 50;
+const fireplace = fireplaceLogic();
 
-let temp = 0;
-let light = 0;
-let fan = 0;
-
-const connection = function() {
+const connection = function () {
   const ws = new WebSocket("ws://" + host + ":" + port);
 
   ws.on("open", () => {
@@ -34,22 +30,8 @@ const connection = function() {
     );
 
     // register interested parameter
-    ["fireplace_fan", "livingroom_light", "fireplace_temp_bottom"].forEach(
-      key => {
-        ws.send(
-          JSON.stringify({
-            key: "register",
-            value: {
-              id: device.id,
-              key: key
-            }
-          })
-        );
-      }
-    );
+    fireplace.observe.forEach(registerKey(ws));
   });
-
-  // TODO should request or get fan state on 'open'
 
   ws.on("error", err => {
     console.log(err.message);
@@ -65,48 +47,40 @@ const connection = function() {
     // TODO catch parsing error
     let data = JSON.parse(event);
 
-    if (data.key === "fireplace_temp_bottom") {
-      temp = data.value;
-      let decision = logic();
-      sendRequest(decision, data);
-    }
-    if (data.key === "livingroom_light") {
-      light = data.value;
-      let decision = logic();
-      sendRequest(decision, data);
-    }
-    if (data.key === "fireplace_fan") {
-      fan = data.value;
-    }
+    fireplace.eval(data, sendRequest(ws, data));
   });
 
-  function sendRequest(decision, data) {
-    if (decision) {
-      ws.send(
-        JSON.stringify({
-          key: "fireplace_fan",
-          trail: {
-            trigger: data.key,
-            origin: "fireplace_logic_request"
-          },
-          transaction_id: data.transaction_id,
-          value: decision
-        })
-      );
+  function sendRequest(ws, data) {
+    return (key, value, origin) => {
+      if (key && value !== undefined) {
+        ws.send(
+          JSON.stringify({
+            key: key,
+            value: value,
+            trail: {
+              trigger: data.key,
+              origin: origin
+            },
+            transaction_id: data.transaction_id
+          })
+        );
+      }
     }
   }
 };
 
-function logic() {
-  if (temp >= startTemp && light == 1 && fan == 0) {
-    return 1;
+function registerKey(ws) {
+  return key => {
+    ws.send(
+      JSON.stringify({
+        key: "register",
+        value: {
+          id: device.id,
+          key: key
+        }
+      })
+    );
   }
-
-  if ((temp < minTemp || light == 0) && fan == 1) {
-    return 0;
-  }
-
-  return undefined;
 }
 
 connection();
