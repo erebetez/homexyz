@@ -6,8 +6,7 @@ import {
   CartesianGrid,
   XAxis,
   YAxis,
-  Tooltip,
-  Legend
+  Tooltip
 } from "recharts";
 
 function LastValue(props) {
