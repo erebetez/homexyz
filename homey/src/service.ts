@@ -42,9 +42,7 @@ async function storeDevice(client, device) {
 }
 
 async function storeStates(client, device) {
-  const retr = await client.query("SELECT key FROM states WHERE id = $1", [
-    device.id
-  ]);
+  const retr = await client.query("SELECT key FROM states");
   const existingKeys = retr.rows.map(x => x.key);
 
   let text: string;
