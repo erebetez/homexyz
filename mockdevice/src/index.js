@@ -61,11 +61,9 @@ const connection = function () {
       let oldValue = someState;
       someState = data.value;
       console.log(`set someState to ${someState}`);
-      // now we cn response with the new state.
-      // FIXME this will probably make an endless loop.....
+      // now we can response with the new state.
       // only sending if changed
-      // FIXME origin is not send anymore....
-      if (data.origin !== data.key && oldValue !== someState) {
+      if (oldValue !== someState) {
         ws.send(
           JSON.stringify({
             key: "light_top",
