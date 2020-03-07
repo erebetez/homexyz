@@ -28,7 +28,7 @@ const devicePingInterval = 1000 * 60 * 60 * 5;
 // - SSL for https
 // - header auth for websocket
 
-const ensureEventObject = function (event) {
+const ensureEventObject = function(event) {
   if (!event.transaction_id) {
     event["transaction_id"] = uuidv4();
   }
@@ -38,11 +38,11 @@ const ensureEventObject = function (event) {
   return event;
 };
 
-const shouldTransaction = function (event) {
+const shouldTransaction = function(event) {
   return event.trail.origin === undefined || event.trail.origin === event.key;
 };
 
-const transactionHandler = (function () {
+const transactionHandler = (function() {
   let transactionTrails = {};
 
   return async (event, finish) => {
@@ -77,19 +77,19 @@ const transactionHandler = (function () {
 
 const q = async.queue(transactionHandler, 1);
 
-q.error(function (err, task) {
+q.error(function(err, task) {
   dbError(err, { task: task });
 });
 
-const connectionHandler = (function () {
+const connectionHandler = (function() {
   let connections = {};
   let registrations = {};
 
-  const isOpen = function (client) {
+  const isOpen = function(client) {
     return client && client.readyState === WebSocket.OPEN;
   };
 
-  const send = function (id, data) {
+  const send = function(id, data) {
     const client = connections[id];
     if (isOpen(client)) {
       client.send(data);
@@ -100,7 +100,7 @@ const connectionHandler = (function () {
     }
   };
 
-  const braodcastToObserver = function (payload) {
+  const braodcastToObserver = function(payload) {
     let data = JSON.stringify(payload);
     let reg = registrations[payload.key];
 
@@ -111,7 +111,7 @@ const connectionHandler = (function () {
     }
   };
 
-  const broadcast = function (payload) {
+  const broadcast = function(payload) {
     let data = JSON.stringify(payload);
 
     Object.keys(connections).forEach(id => {
@@ -119,7 +119,7 @@ const connectionHandler = (function () {
     });
   };
 
-  const cleanup = function () {
+  const cleanup = function() {
     Object.keys(connections).forEach(id => {
       const client = connections[id];
       if (!isOpen(client)) {
@@ -240,7 +240,7 @@ const connectionHandler = (function () {
   };
 })();
 
-const startWss = function () {
+const startWss = function() {
   const wss = new WebSocket.Server({
     server: http,
     port: ws_port,
