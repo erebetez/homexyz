@@ -10,7 +10,7 @@ services:
   logic:
     build: ./logic
     environment:
-      homeyhost: moria
+      homeyhost: homey
       homeyport: 3667
     depends_on:
       - homey
