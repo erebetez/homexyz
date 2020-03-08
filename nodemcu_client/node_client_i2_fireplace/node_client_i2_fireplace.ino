@@ -223,7 +223,7 @@ void readDataTemperatureOneWire()
 
     tempBottom = newT;
   }
-  else if (abs(tempBottom - newT) > 1)
+  else if (abs(tempBottom - newT) > 0.1)
   {
     tempBottom = newT;
     Serial.println(tempBottom);

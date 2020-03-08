@@ -239,7 +239,7 @@ void readDataTemperatureDHT()
 
     t1 = -127;
   }
-  else if (abs(t1 - newT) > 0.5)
+  else if (abs(t1 - newT) > 0.1)
   {
     t1 = newT;
     Serial.println(t1);
@@ -263,7 +263,7 @@ void readDataTemperatureOneWire()
     }
     t2 = newT;
   }
-  else if (abs(t2 - newT) > 0.5)
+  else if (abs(t2 - newT) > 0.1)
   {
     t2 = newT;
     Serial.println(t2);
@@ -287,7 +287,7 @@ void readDataHumidity()
 
     h = -127;
   }
-  else if (abs(h - newH) > 2)
+  else if (abs(h - newH) > 1)
   {
     h = newH;
     Serial.println(h);
