@@ -17,7 +17,7 @@ const port = process.env.homeyport || "3667";
 
 const fireplace = fireplaceLogic();
 
-const connection = function () {
+const connection = function() {
   const ws = new WebSocket("ws://" + host + ":" + port);
 
   ws.on("open", () => {
@@ -52,6 +52,8 @@ const connection = function () {
 
   function sendRequest(ws, data) {
     return (key, value, origin) => {
+      console.log("Sending logic request:");
+      console.log("data: " + data + ", key:" + key + ", value: " + value);
       if (key && value !== undefined) {
         ws.send(
           JSON.stringify({
@@ -65,7 +67,7 @@ const connection = function () {
           })
         );
       }
-    }
+    };
   }
 };
 
@@ -80,7 +82,7 @@ function registerKey(ws) {
         }
       })
     );
-  }
+  };
 }
 
 connection();
