@@ -6,9 +6,9 @@
 #include <DallasTemperature.h>
 #include <OneWire.h>
 
-const char *ssid = "Isengard";
+const char *ssid = "powder";
 const char *password = "123456";
-const char *websockets_server = "ws://192.168.0.5:3667";
+const char *websockets_server = "ws://moria:3667";
 
 // Device properties
 const String id = "i3";
