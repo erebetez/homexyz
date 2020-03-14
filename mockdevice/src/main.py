@@ -24,6 +24,8 @@ DEVICE = {
 def on_open(ws):
     print("Connected to " + HOST + ":" + PORT)
 
+    set_interval(saw_down(ws), 6)
+
     ws.send(
         json.dumps({
             "key": "device",
@@ -46,7 +48,8 @@ def on_error(ws, error):
 
 def on_close(ws):
     print("### closed ###")
-    # thread.start_new_thread(init, ())
+    ws.close()
+    # init_ws()
 
 
 def messageHandler():
@@ -74,7 +77,7 @@ def messageHandler():
     return on_message
 
 
-def saw_down():
+def saw_down(ws):
     saw = 100
 
     def new_val():
@@ -100,12 +103,14 @@ def set_interval(func, sec):
     return t
 
 
-if __name__ == "__main__":
-    websocket.enableTrace(False)
+def init_ws():
     ws = websocket.WebSocketApp("ws://" + HOST + ":" + PORT,
                                 on_message=messageHandler(),
                                 on_error=on_error,
                                 on_close=on_close)
     ws.on_open = on_open
-    set_interval(saw_down(), 6)
     ws.run_forever()
+
+
+if __name__ == "__main__":
+    init_ws()
