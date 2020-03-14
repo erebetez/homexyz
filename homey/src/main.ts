@@ -202,9 +202,7 @@ const connectionHandler = (function () {
                 } else if (retr.rowCount > 0) {
                   send(request.id, JSON.stringify(retr.rows[0]));
                 } else {
-                  console.log(
-                    `No data yet for ${request.key}, can't send anything.`
-                  );
+                  send(request.id, JSON.stringify({ key: request.key, value: null }));
                 }
               }
             );
