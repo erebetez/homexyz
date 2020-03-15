@@ -57,7 +57,7 @@ const connection = function () {
     let data = JSON.parse(event);
 
     // just interested in my key
-    if (data.key === "light_top") {
+    if (data.key === "light_top" && data.value != null) {
       let oldValue = someState;
       someState = data.value;
       console.log(`set someState to ${someState}`);
@@ -77,6 +77,7 @@ const connection = function () {
 
 
   setInterval(() => {
+    // FIXME make it a closure...
     saw += 1;
 
     if (saw > 100) {
