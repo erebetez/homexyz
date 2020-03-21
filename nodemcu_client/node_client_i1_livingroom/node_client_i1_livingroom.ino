@@ -118,6 +118,8 @@ void onMessageCallback(WebsocketsMessage message)
     const char *key = event["key"];
     const char *transaction_id = event["transaction_id"];
 
+    // FIXME ignore event["value"] === null;
+
     if (strcmp(key, "led1") == 0)
     {
 

@@ -110,7 +110,7 @@ function App() {
 
                 <hr></hr>
                 <h4>Mockdevice</h4>
-                <Events select={["light_top"]} limit="1">
+                <Events select={["light_top", "light_bottom"]} limit="1">
                   {(err, eventDict) => (
                     <div>
                       <LastValue
@@ -121,6 +121,16 @@ function App() {
                       <ToggleButton
                         name="button_mock_state"
                         eventList={eventDict.light_top}
+                      ></ToggleButton>
+
+                      <LastValue
+                        eventList={eventDict.light_bottom}
+                        state={states.light_bottom}
+                      ></LastValue>
+
+                      <ToggleButton
+                        name="button_mock_state2"
+                        eventList={eventDict.light_bottom}
                       ></ToggleButton>
                     </div>
                   )}
@@ -137,7 +147,8 @@ function App() {
                       select={[
                         "temperature_mock",
                         "possible_error_mock",
-                        "saw_mock"
+                        "saw_mock",
+                        "saw_down_mock"
                       ]}
 
                     >
@@ -164,6 +175,14 @@ function App() {
                             <LastValue
                               eventList={eventDict.saw_mock}
                               state={states.saw_mock}
+                            ></LastValue>
+                          </div>
+
+                          <div>
+                            <span>saw_down_mock: </span>
+                            <LastValue
+                              eventList={eventDict.saw_down_mock}
+                              state={states.saw_down_mock}
                             ></LastValue>
                           </div>
 
