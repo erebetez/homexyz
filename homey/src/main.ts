@@ -150,6 +150,7 @@ const connectionHandler = (function() {
       });
 
       ws.on("message", async message => {
+        // add datetime to log.
         console.log("got: %s", message);
 
         let event;
@@ -202,7 +203,10 @@ const connectionHandler = (function() {
                 } else if (retr.rowCount > 0) {
                   send(request.id, JSON.stringify(retr.rows[0]));
                 } else {
-                  send(request.id, JSON.stringify({ key: request.key, value: null }));
+                  send(
+                    request.id,
+                    JSON.stringify({ key: request.key, value: null })
+                  );
                 }
               }
             );
