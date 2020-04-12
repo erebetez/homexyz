@@ -61,11 +61,9 @@ def messageHandler():
         print(message)
         data = json.loads(message)
 
-        if data["key"] == "light_bottom":
-            oldValue = None
-            if data["value"] is not None:
-                oldValue = light_state
-                light_state = data["value"]
+        if data["key"] == "light_bottom" and data["value"] is not None:
+            oldValue = light_state
+            light_state = data["value"]
 
             if oldValue != light_state:
                 ws.send(
