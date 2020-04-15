@@ -12,8 +12,8 @@ const char *websockets_server = "ws://moria:3667";
 
 // Device properties
 const String id = "i3";
-const String name = "corner";
-const String desc = "Livingroom Fireplace corner";
+const String name = "kitchen";
+const String desc = "Kitchen under sink";
 
 String states = "";
 
@@ -61,9 +61,9 @@ void setup()
 
   // Set states
   states = "{";
-  states += "\"temperature1\": {\"location\": \"livingroom\",\"type\": \"sensor\", \"unit\": \"°C\"},";
-  states += "\"temperature2\": {\"location\": \"livingroom\",\"type\": \"sensor\", \"unit\": \"°C\"},";
-  states += "\"humidity1\": {\"location\": \"livingroom\",\"type\": \"sensor\", \"unit\": \"%\"}";
+  states += "\"temperature3\": {\"location\": \"kitchen\",\"type\": \"sensor\", \"unit\": \"°C\"},";
+  states += "\"temperature4\": {\"location\": \"kitchen\",\"type\": \"sensor\", \"unit\": \"°C\"},";
+  states += "\"humidity2\": {\"location\": \"kitchen\",\"type\": \"sensor\", \"unit\": \"%\"}";
   states += "}";
 
   // Connect to wifi
@@ -227,6 +227,10 @@ void readDataTemperatureOneWire()
   sensors.requestTemperatures();
 
   float newT = sensors.getTempCByIndex(0);
+  //float newT1 = sensors.getTempCByIndex(1);
+
+  Serial.println(newT);
+  //Serial.println(newT1);
 
   if (newT == -127)
   {
