@@ -1,6 +1,8 @@
 #include <ArduinoWebsockets.h>
 #include <ESP8266WiFi.h>
 #include <ArduinoJson.h>
+#include <Adafruit_Sensor.h>
+#include <DHT.h>
 #include <DallasTemperature.h>
 #include <OneWire.h>
 
@@ -15,8 +17,10 @@ const String desc = "Next to fireplace";
 
 String states = "";
 
-// Assign output variables to GPIO pins
+// Assign variables to GPIO pins
 const int output2 = 2;
+
+// DHT11
 const int input5 = 5;
 
 // DS18B20
@@ -26,6 +30,10 @@ const int input5 = 5;
 
 OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
+
+#define DHTTYPE DHT11
+
+DHT dht(input5, DHTTYPE);
 
 const uint32_t readIntervall = 30000;
 long readIntervall_lastMillis = 0;
@@ -38,6 +46,9 @@ int fanOn = 0;
 int lightOn = 2;
 
 // Data
+float t1 = 0.0;
+float t2 = 0.0;
+float h = 0.0;
 float tempBottom = 0.0;
 
 using namespace websockets;
@@ -54,12 +65,15 @@ void setup()
   // Set outputs to LOW
   digitalWrite(output2, HIGH);
 
+  dht.begin();
   sensors.begin();
 
   // Set states
   states = "{";
+  states += "\"temperature1\": {\"location\": \"livingroom\",\"type\": \"sensor\", \"unit\": \"°C\"},";
+  states += "\"temperature2\": {\"location\": \"livingroom\",\"type\": \"sensor\", \"unit\": \"°C\"},";
+  states += "\"humidity1\": {\"location\": \"livingroom\",\"type\": \"sensor\", \"unit\": \"%\"}";
   states += "\"fireplace_fan\": {\"location\": \"fireplace\",\"type\": \"switch\",\"range\": [0,1]},";
-  states += "\"livingroom_light\": {\"location\": \"livingroom\",\"type\": \"sensor\",\"range\": [0,1]},";
   states += "\"fireplace_temp_bottom\": {\"location\": \"fireplace\",\"type\": \"sensor\", \"unit\": \"°C\"}";
   states += "}";
 
@@ -163,8 +177,9 @@ void loop()
   if (currentMillis - readIntervall_lastMillis > readIntervall)
   {
     readIntervall_lastMillis = currentMillis;
+    readDataTemperatureDHT();
     readDataTemperatureOneWire();
-    readLightSensor();
+    readDataHumidity();
   }
 }
 
@@ -185,34 +200,14 @@ void webSocketConnect()
   }
 }
 
-void readLightSensor()
-{
-  int newValue = digitalRead(input5);
-  // Sensor return HIGH if light is off.
-  if (newValue == HIGH)
-  {
-    newValue = 0;
-  }
-  else
-  {
-    newValue = 1;
-  }
-
-  if (lightOn != newValue)
-  {
-    lightOn = newValue;
-    Serial.println(newValue);
-    client.send("{\"key\": \"livingroom_light\", \"value\":" + String(lightOn) + "}");
-  }
-}
-
 void readDataTemperatureOneWire()
 {
   sensors.requestTemperatures();
 
-  float newT = sensors.getTempCByIndex(0);
+  float newT01 = sensors.getTempCByIndex(0);
+  float newT02 = sensors.getTempCByIndex(1);
 
-  if (newT == -127)
+  if (newT01 == -127)
   {
     Serial.println("Failed to read temperature from DS18B20 sensor!");
     if (tempBottom != -127)
@@ -221,13 +216,82 @@ void readDataTemperatureOneWire()
       client.send("{\"key\": \"log\", \"value\": {\"id\": \"" + id + "\", \"key\": \"fireplace_temp_bottom\", \"message\": \"Failed to read temperature from DS18B20 sensor!\" }}");
     }
 
-    tempBottom = newT;
+    tempBottom = newT01;
   }
-  else if (abs(tempBottom - newT) > 0.1)
+  else if (abs(tempBottom - newT01) > 0.1)
   {
-    tempBottom = newT;
+    tempBottom = newT01;
     Serial.println(tempBottom);
     client.send("{\"key\": \"fireplace_temp_bottom\", \"value\":" + String(tempBottom) + "}");
   }
+
+  if (newT02 == -127)
+  {
+    Serial.println("Failed to read temperature from DS18B20 sensor!");
+    if (t2 != -127)
+    {
+      client.send("{\"key\": \"temperature2\", \"value\": null}");
+      client.send("{\"key\": \"log\", \"value\": {\"id\": \"" + id + "\", \"key\": \"temperature2\", \"message\": \"Failed to read temperature from DS18B20 sensor!\" }}");
+    }
+
+    t2 = newT02;
+  }
+  else if (abs(t2 - newT02) > 0.1)
+  {
+    t2 = newT02;
+    Serial.println(tempBottom);
+    client.send("{\"key\": \"temperature2\", \"value\":" + String(t2) + "}");
+  }
+  return;
+}
+
+void readDataTemperatureDHT()
+{
+  // Read temperature as Celsius (the default)
+  float newT = dht.readTemperature();
+
+  if (isnan(newT))
+  {
+    Serial.println("Failed to read temperature from DHT sensor!");
+    if (t1 != -127)
+    {
+      client.send("{\"key\": \"temperature1\", \"value\": null}");
+      client.send("{\"key\": \"log\", \"value\": {\"id\": \"" + id + "\", \"key\": \"temperature1\", \"message\": \"Failed to read temperature from DHT11 sensor!\" }}");
+    }
+
+    t1 = -127;
+  }
+  else if (abs(t1 - newT) > 0.1)
+  {
+    t1 = newT;
+    Serial.println(t1);
+    client.send("{\"key\": \"temperature1\", \"value\":" + String(t1) + "}");
+  }
+  return;
+}
+
+void readDataHumidity()
+{
+  // Read Humidity
+  float newH = dht.readHumidity();
+
+  if (isnan(newH))
+  {
+    Serial.println("Failed to read humidity from DHT sensor!");
+    if (h != -127)
+    {
+      client.send("{\"key\": \"humidity1\", \"value\": null}");
+      client.send("{\"key\": \"log\", \"value\": {\"id\": \"" + id + "\", \"key\": \"humidity1\", \"message\": \"Failed to read humidity from DHT11 sensor!\" }}");
+    }
+
+    h = -127;
+  }
+  else if (abs(h - newH) > 1)
+  {
+    h = newH;
+    Serial.println(h);
+    client.send("{\"key\": \"humidity1\", \"value\":" + String(h) + "}");
+  }
+
   return;
 }
