@@ -22,50 +22,73 @@ function App() {
               <div>
                 <Devices devices={devices} states={states}></Devices>
                 <hr></hr>
-                <h4>Fireplace</h4>
                 <Events
                   select={[
                     "fireplace_fan",
-                    "livingroom_light",
                     "fireplace_temp_bottom",
                     "temperature2",
-                    "humidity1"
+                    "humidity1",
+                    "temperature3",
+                    "humidity2"
                   ]}
                   limit="1"
                 >
                   {(err, eventDict) => (
                     <div>
-                      <span>Fan: </span>
-                      <LastValue
-                        eventList={eventDict.fireplace_fan}
-                        state={states.fireplace_fan}
-                      ></LastValue>
-                      <ToggleButton
-                        name="fireplace_fan_button"
-                        eventList={eventDict.fireplace_fan}
-                      ></ToggleButton>
-                      <span>Light: </span>
-                      <LastValue
-                        eventList={eventDict.livingroom_light}
-                        state={states.livingroom_light}
-                      ></LastValue>
-                      <span>Temp bottom: </span>
-                      <LastValue
-                        eventList={eventDict.fireplace_temp_bottom}
-                        state={states.fireplace_temp_bottom}
-                      ></LastValue>
+                      <h4>Fireplace</h4>
+                      <div>
+                        <span>Fan: </span>
+                        <LastValue
+                          eventList={eventDict.fireplace_fan}
+                          state={states.fireplace_fan}
+                        ></LastValue>
 
-                      <span>Temp corner: </span>
-                      <LastValue
-                        eventList={eventDict.temperature2}
-                        state={states.temperature2}
-                      ></LastValue>
+                        <ToggleButton
+                          name="fireplace_fan_button"
+                          eventList={eventDict.fireplace_fan}
+                        ></ToggleButton>
+                      </div>
+                      <div>
+                        <span>Temp bottom: </span>
+                        <LastValue
+                          eventList={eventDict.fireplace_temp_bottom}
+                          state={states.fireplace_temp_bottom}
+                        ></LastValue>
+                      </div>
 
-                      <span>Humidity corner: </span>
-                      <LastValue
-                        eventList={eventDict.humidity1}
-                        state={states.humidity1}
-                      ></LastValue>
+                      <h4>Livingroom</h4>
+                      <div>
+                        <span>Temperature: </span>
+                        <LastValue
+                          eventList={eventDict.temperature2}
+                          state={states.temperature2}
+                        ></LastValue>
+                      </div>
+                      <div>
+                        <span>Humidity: </span>
+                        <LastValue
+                          eventList={eventDict.humidity1}
+                          state={states.humidity1}
+                        ></LastValue>
+                      </div>
+
+                      <h4>Kitchen</h4>
+
+                      <div>
+                        <span>Temperature: </span>
+                        <LastValue
+                          eventList={eventDict.temperature3}
+                          state={states.temperature3}
+                        ></LastValue>
+                      </div>
+
+                      <div>
+                        <span>Humidity: </span>
+                        <LastValue
+                          eventList={eventDict.humidity2}
+                          state={states.humidity2}
+                        ></LastValue>
+                      </div>
                     </div>
                   )}
                 </Events>
@@ -74,36 +97,20 @@ function App() {
                   select={[
                     "fireplace_temp_bottom",
                     "temperature2",
+                    "temperature3",
                     "humidity1",
-                    "fireplace_fan"
+                    "humidity2"
                   ]}
                   from={new Date(Date.now() - 344000000).toISOString()}
                 >
                   {(err, eventDict) => (
                     <div>
+                      <hr></hr>
+                      <h4>Graphs</h4>
                       <HistoryDisplay
                         eventDict={eventDict}
                         states={states}
                       ></HistoryDisplay>
-                    </div>
-                  )}
-                </Events>
-
-                <hr></hr>
-                <h4>Livingroom</h4>
-                <Events select={["led1", "led2"]} limit="1">
-                  {(err, eventDict) => (
-                    <div>
-                      <ToggleButton
-                        key="button_led1"
-                        name="button_led1"
-                        eventList={eventDict.led1}
-                      ></ToggleButton>
-                      <ToggleButton
-                        key="button_led2"
-                        name="button_led2"
-                        eventList={eventDict.led2}
-                      ></ToggleButton>
                     </div>
                   )}
                 </Events>
@@ -150,7 +157,6 @@ function App() {
                         "saw_mock",
                         "saw_down_mock"
                       ]}
-
                     >
                       {(err, eventDict) => (
                         <div>
@@ -225,7 +231,6 @@ class RangeChooser extends React.Component {
       from: temp - this.state.range * 1000 * 60 * 60,
       to: temp
     });
-
   }
   clickeForward(ev) {
     console.log("forward");
