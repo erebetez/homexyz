@@ -24,13 +24,10 @@ DHT dht(input4, DHTTYPE);
 const uint32_t readIntervall = 30000;
 long readIntervall_lastMillis = 0;
 
-const uint32_t sendIntervall = 600000; // 10min
-long sendIntervall_lastMillis = 0;
-
 // States
 
 // Data
-float t1 = 0.0;
+float t3 = 0.0;
 float h = 0.0;
 
 using namespace websockets;
@@ -101,11 +98,11 @@ void onEventsCallback(WebsocketsEvent event, String data)
 
 void loop()
 {
-  webSocketConnect();
 
   long currentMillis = millis();
   if (currentMillis - readIntervall_lastMillis > readIntervall)
   {
+    webSocketConnect();
     readIntervall_lastMillis = currentMillis;
     readDataTemperatureDHT();
     readDataHumidity();
@@ -137,18 +134,18 @@ void readDataTemperatureDHT()
   if (isnan(newT))
   {
     Serial.println("Failed to read temperature from DHT sensor!");
-    if (t1 != -127)
+    if (t3 != -127)
     {
       client.send("{\"key\":\"temperature3\",\"value\": null}");
     }
 
-    t1 = -127;
+    t3 = -127;
   }
-  else if (abs(t1 - newT) > 0.1)
+  else if (abs(t3 - newT) > 0.1)
   {
-    t1 = newT;
-    Serial.println(t1);
-    client.send("{\"key\":\"temperature3\",\"value\":" + String(t1) + "}");
+    t3 = newT;
+    Serial.println(t3);
+    client.send("{\"key\":\"temperature3\",\"value\":" + String(t3) + "}");
   }
   return;
 }
