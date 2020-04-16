@@ -44,9 +44,6 @@ const int BMP280_SDA = 14;
 const uint32_t readIntervall = 30000;
 long readIntervall_lastMillis = 0;
 
-const uint32_t sendIntervall = 600000; // 10min
-long sendIntervall_lastMillis = 0;
-
 // States
 int fanOn = 0;
 int lightOn = 2;
@@ -91,7 +88,7 @@ void setup()
   states += "\"temperature2\": {\"location\": \"livingroom\",\"type\": \"sensor\", \"unit\": \"°C\"},";
   states += "\"temperature4\": {\"location\": \"livingroom\",\"type\": \"sensor\", \"unit\": \"°C\"},";
   states += "\"humidity1\": {\"location\": \"livingroom\",\"type\": \"sensor\", \"unit\": \"%\"},";
-  states += "\"presure1\": {\"location\": \"livingroom\",\"type\": \"sensor\", \"unit\": \"hPa\"},";
+  states += "\"pressure1\": {\"location\": \"livingroom\",\"type\": \"sensor\", \"unit\": \"hPa\"},";
   states += "\"fireplace_fan\": {\"location\": \"fireplace\",\"type\": \"switch\",\"range\": [0,1]},";
   states += "\"fireplace_temp_bottom\": {\"location\": \"fireplace\",\"type\": \"sensor\", \"unit\": \"°C\"}";
   states += "}";
@@ -190,11 +187,11 @@ void onEventsCallback(WebsocketsEvent event, String data)
 
 void loop()
 {
-  webSocketConnect();
 
   long currentMillis = millis();
   if (currentMillis - readIntervall_lastMillis > readIntervall)
   {
+    webSocketConnect();
     readIntervall_lastMillis = currentMillis;
     readDataTemperatureDHT();
     readDataTemperatureOneWire();
@@ -319,17 +316,25 @@ void readDataHumidity()
 void readBMP280()
 {
   // FIXME What is returne when read fails?
-  t4 = bmp.readTemperature();
-  Serial.print(F("Temperature = "));
-  Serial.print(t4);
+  float t4_new = bmp.readTemperature();
+
+  Serial.print(t4_new);
   Serial.println(" *C");
 
-  client.send("{\"key\": \"temperature4\", \"value\":" + String(t4) + "}");
+  if (abs(t4_new - t4) > 0.1)
+  {
+    t4 = t4_new;
+    client.send("{\"key\": \"temperature4\", \"value\":" + String(t4) + "}");
+  }
 
-  pressure = bmp.readPressure() / 100;
-  Serial.print(F("Pressure = "));
-  Serial.print(pressure);
+  float pressure_new = bmp.readPressure() / 100;
+
+  Serial.print(pressure_new);
   Serial.println(" hPa");
 
-  client.send("{\"key\": \"presure1\", \"value\":" + String(pressure) + "}");
+  if (abs(pressure - pressure_new) > 0.5)
+  {
+    pressure = pressure_new;
+    client.send("{\"key\": \"pressure1\", \"value\":" + String(pressure) + "}");
+  }
 }
