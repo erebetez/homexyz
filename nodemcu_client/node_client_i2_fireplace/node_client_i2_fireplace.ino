@@ -5,6 +5,7 @@
 #include <DHT.h>
 #include <DallasTemperature.h>
 #include <OneWire.h>
+#include <Adafruit_BMP280.h>
 
 const char *ssid = "powder";
 const char *password = "123456";
@@ -35,6 +36,11 @@ DallasTemperature sensors(&oneWire);
 
 DHT dht(input5, DHTTYPE);
 
+Adafruit_BMP280 bmp; // I2C Interface
+const int BMP280_SCL = 12;
+const int BMP280_SDA = 14;
+// NOTE: CSB and SDD must be HIGH in order to use I2C.
+
 const uint32_t readIntervall = 30000;
 long readIntervall_lastMillis = 0;
 
@@ -48,7 +54,9 @@ int lightOn = 2;
 // Data
 float t1 = 0.0;
 float t2 = 0.0;
+float t4 = 0.0;
 float h = 0.0;
+float pressure = 0.0;
 float tempBottom = 0.0;
 
 using namespace websockets;
@@ -68,11 +76,22 @@ void setup()
   dht.begin();
   sensors.begin();
 
+  Wire.begin(BMP280_SDA, BMP280_SCL);
+
+  if (!bmp.begin())
+  {
+    Serial.println(F("Could not find a valid BMP280 sensor, check wiring!"));
+    while (1)
+      ;
+  }
+
   // Set states
   states = "{";
   states += "\"temperature1\": {\"location\": \"livingroom\",\"type\": \"sensor\", \"unit\": \"°C\"},";
   states += "\"temperature2\": {\"location\": \"livingroom\",\"type\": \"sensor\", \"unit\": \"°C\"},";
+  states += "\"temperature4\": {\"location\": \"livingroom\",\"type\": \"sensor\", \"unit\": \"°C\"},";
   states += "\"humidity1\": {\"location\": \"livingroom\",\"type\": \"sensor\", \"unit\": \"%\"},";
+  states += "\"presure1\": {\"location\": \"livingroom\",\"type\": \"sensor\", \"unit\": \"hPa\"},";
   states += "\"fireplace_fan\": {\"location\": \"fireplace\",\"type\": \"switch\",\"range\": [0,1]},";
   states += "\"fireplace_temp_bottom\": {\"location\": \"fireplace\",\"type\": \"sensor\", \"unit\": \"°C\"}";
   states += "}";
@@ -180,6 +199,7 @@ void loop()
     readDataTemperatureDHT();
     readDataTemperatureOneWire();
     readDataHumidity();
+    readBMP280();
   }
 }
 
@@ -294,4 +314,22 @@ void readDataHumidity()
   }
 
   return;
+}
+
+void readBMP280()
+{
+  // FIXME What is returne when read fails?
+  t4 = bmp.readTemperature();
+  Serial.print(F("Temperature = "));
+  Serial.print(t4);
+  Serial.println(" *C");
+
+  client.send("{\"key\": \"temperature4\", \"value\":" + String(t4) + "}");
+
+  pressure = bmp.readPressure() / 100;
+  Serial.print(F("Pressure = "));
+  Serial.print(pressure);
+  Serial.println(" hPa");
+
+  client.send("{\"key\": \"presure1\", \"value\":" + String(pressure) + "}");
 }
