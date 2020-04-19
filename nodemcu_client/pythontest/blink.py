@@ -1,6 +1,8 @@
 from machine import Pin
 from machine import Timer
 
+SCAN_INTERVAL = 2000
+
 
 def blinker():
     print('setup blinker')
@@ -23,4 +25,4 @@ def blinker():
 
 blink_timer = Timer(-1)
 
-blink_timer.init(period=2000, mode=Timer.PERIODIC, callback=blinker())
+blink_timer.init(period=SCAN_INTERVAL, mode=Timer.PERIODIC, callback=blinker())
