@@ -26,7 +26,10 @@ function App() {
                   select={[
                     "fireplace_fan",
                     "fireplace_temp_bottom",
+                    "temperature1",
                     "temperature2",
+                    "temperature4",
+                    "pressure1",
                     "humidity1",
                     "temperature3",
                     "humidity2"
@@ -60,8 +63,16 @@ function App() {
                       <div>
                         <span>Temperature: </span>
                         <LastValue
+                          eventList={eventDict.temperature1}
+                          state={states.temperature1}
+                        ></LastValue>
+                        <LastValue
                           eventList={eventDict.temperature2}
                           state={states.temperature2}
+                        ></LastValue>
+                        <LastValue
+                          eventList={eventDict.temperature4}
+                          state={states.temperature4}
                         ></LastValue>
                       </div>
                       <div>
@@ -69,6 +80,13 @@ function App() {
                         <LastValue
                           eventList={eventDict.humidity1}
                           state={states.humidity1}
+                        ></LastValue>
+                      </div>
+                      <div>
+                        <span>Pressure: </span>
+                        <LastValue
+                          eventList={eventDict.pressure1}
+                          state={states.pressure1}
                         ></LastValue>
                       </div>
 
@@ -99,7 +117,8 @@ function App() {
                     "temperature2",
                     "temperature3",
                     "humidity1",
-                    "humidity2"
+                    "humidity2",
+                    "pressure1"
                   ]}
                   from={new Date(Date.now() - 344000000).toISOString()}
                 >
